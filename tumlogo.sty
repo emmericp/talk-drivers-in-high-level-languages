@@ -1,0 +1,188 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumlogo}[2016/03/17 TUM logo and TUM department logos]
+
+\RequirePackage{tikz}
+\RequirePackage{tumcolor}
+
+
+%\TUMLogo[color]{height}
+\newcommand{\TUMLogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (0.000,0.000) rectangle (1.897,1.000);
+		\path[fill=#1]
+		(0.179,0.821) --
+		(0.179,0.000) --
+		(0.359,0.000) --
+		(0.359,0.821) --
+		(0.564,0.821) --
+		(0.564,0.000) --
+		(1.128,0.000) --
+		(1.128,0.821) --
+		(1.333,0.821) --
+		(1.333,0.000) --
+		(1.513,0.000) --
+		(1.513,0.821) --
+		(1.718,0.821) --
+		(1.718,0.000) --
+		(1.897,0.000) --
+		(1.897,1.000) --
+		(0.949,1.000) --
+		(0.949,0.179) --
+		(0.744,0.179) --
+		(0.744,1.000) --
+		(0.000,1.000) --
+		(0.000,0.821) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\ARLogo[color]{height}
+\newcommand{\ARLogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.500) rectangle (0.500,0.500);
+		\path[fill=#1]
+		(  0:0.5250) arc (  0:360:0.5250) --
+		(360:0.5036) arc (360:  0:0.5036) --
+		cycle
+		(-0.3575,-0.3700) --
+		( 0.0000, 0.4935) --
+		( 0.3575,-0.3700) --
+		( 0.3698,-0.3575) --
+		( 0.0090, 0.5140) --
+		(-0.0090, 0.5140) --
+		(-0.3698,-0.3575) --
+		cycle
+		(-0.4950,-0.1409) --
+		( 0.4950,-0.1409) --
+		( 0.5000,-0.1250) --
+		(-0.5000,-0.1250) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\BVLogo[color]{height}
+\newcommand{\BGULogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.500) rectangle (0.500,0.500);
+		\path[fill=#1]
+		(  0:0.5250) arc (  0:360:0.5250) --
+		(360:0.5036) arc (360:  0:0.5036) --
+		cycle
+		(-0.5050, 0.0796) --
+		( 0.5050, 0.0796) --
+		( 0.5000, 0.0956) --
+		(-0.5000, 0.0956) --
+		cycle
+		(-0.4900,-0.1410) .. controls (-0.3250, 0.0068) and (-0.1000,0.0068) ..
+		( 0.0000, 0.0068) .. controls ( 0.1000, 0.0068) and ( 0.3250,0.0068) ..
+		( 0.4900,-0.1410) --
+		( 0.5000,-0.1280) .. controls ( 0.3300, 0.0228) and ( 0.1100,0.0228) ..
+		( 0.0000, 0.0228) .. controls (-0.1100, 0.0228) and (-0.3300,0.0228) ..
+		(-0.5000,-0.1280) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\EILogo[color]{height}
+\newcommand{\EILogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.520) rectangle (0.500,0.480);
+		\path[fill=#1]
+		(-0.5250,-0.5200) --
+		(-0.1250,-0.5200) --
+		(255.5:0.4986) arc (255.5:-75.5:0.4986) --
+		( 0.1250,-0.5200) --
+		( 0.5250,-0.5200) --
+		( 0.5250,-0.4986) --
+		(-73.5:0.5200) arc (-73.5:253.5:0.5200) --
+		(-0.5250,-0.4986) --
+		cycle
+		(-0.4660,-0.2100) .. controls (-0.3500,-0.2100) and (-0.3220, 0.1940) ..
+		(-0.1520, 0.1940) .. controls ( 0.0170, 0.1940) and ( 0.0160,-0.2100) ..
+		( 0.1580,-0.2100) .. controls ( 0.3020,-0.2100) and ( 0.3050, 0.1940) ..
+		( 0.4630, 0.1940) --
+		( 0.4580, 0.2100) .. controls ( 0.2950, 0.2100) and ( 0.2850,-0.1940) ..
+		( 0.1580,-0.1940) .. controls ( 0.0330,-0.1940) and ( 0.0290, 0.2100) ..
+		(-0.1520, 0.2100) .. controls (-0.3350, 0.2100) and (-0.3650,-0.1940) ..
+		(-0.4680,-0.1940) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\INLogo[color]{height}
+\newcommand{\INLogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.500) rectangle (0.500,0.500);
+		\path[fill=#1]
+		(-265.2:0.5250) arc (-265.2:  85.2:0.5250) --
+		(  85.2:0.5036) arc (  85.2:-265.2:0.5036) --
+		cycle
+		(-0.0107,-0.4077) --
+		( 0.0107,-0.4077) --
+		( 0.0107, 0.6287) --
+		(-0.0107, 0.6287) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\MALogo[color]{height}
+\newcommand{\MALogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.500) rectangle (0.500,0.500);
+		\path[fill=#1]
+		(  0:0.5250) arc (  0:360:0.5250) --
+		(360:0.5036) arc (360:  0:0.5036) --
+		cycle
+		( 0.0000, 0.5008) --
+		(-0.4337, 0.2504) --
+		(-0.4337,-0.2504) --
+		( 0.0000,-0.5008) --
+		( 0.4337,-0.2504) --
+		( 0.4337, 0.2504) --
+		cycle
+		( 0.0000, 0.4823) --
+		( 0.4177, 0.2412) --
+		( 0.4177,-0.2412) --
+		( 0.0000,-0.4823) --
+		(-0.4177,-0.2412) --
+		(-0.4177, 0.2412) --
+		cycle
+		( 0.0000, 0.4806) --
+		(-0.4162,-0.2403) --
+		( 0.4162,-0.2403) --
+		cycle
+		( 0.0000, 0.4486) --
+		( 0.3885,-0.2243) --
+		(-0.3885,-0.2243) --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+%\PHLogo[color]{height}
+\newcommand{\PHLogo}[2][TUMBlue]%
+{%
+	\begin{tikzpicture}[x=#2,y=#2]
+		\useasboundingbox (-0.500,-0.500) rectangle (0.500,0.500);
+		\path[fill=#1]
+		(  0:0.5250) arc (  0:360:0.5250) --
+		(360:0.5036) arc (360:  0:0.5036) --
+		cycle
+		(-270:0.4965) arc [start angle=-270,end angle=  90,x radius=0.1765,y radius=0.4965,rotate=  0] --
+		(  90:0.4805) arc [start angle=  90,end angle=-270,x radius=0.1605,y radius=0.4805,rotate=  0] --
+		cycle
+		(-210:0.4965) arc [start angle=-270,end angle=  90,x radius=0.1765,y radius=0.4965,rotate= 60] --
+		( 150:0.4805) arc [start angle=  90,end angle=-270,x radius=0.1605,y radius=0.4805,rotate= 60] --
+		cycle
+		(-150:0.4965) arc [start angle=-270,end angle=  90,x radius=0.1765,y radius=0.4965,rotate=120] --
+		( 210:0.4805) arc [start angle=  90,end angle=-270,x radius=0.1605,y radius=0.4805,rotate=120] --
+		cycle;
+	\end{tikzpicture}%
+}%
+
+\endinput

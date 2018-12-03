@@ -1,0 +1,50 @@
+% Contains moepdef environments for definitions, theorems etc.
+
+\newcommand{\currentsection}{}
+
+%___________________
+\usepackage{ifthen}
+\usepackage{framed}
+
+\newenvironment{fshaded}{%
+\def\FrameCommand{\fcolorbox{framecolor}{shadecolor}}%
+\MakeFramed {\FrameRestore}}%
+{\endMakeFramed}
+
+\newenvironment{moepdef}[3] {
+    \definecolor{shadecolor}{rgb}{1,.8,.8}%
+    \definecolor{framecolor}{rgb}{1,0,0}%
+
+    \ifthenelse{\equal{#1}{red}}{
+        \ifthenelse{\equal{#2}{filled}}{
+            \definecolor{shadecolor}{rgb}{1,.98,.98}%
+            \definecolor{framecolor}{rgb}{1,0,0}%
+        }{
+            \definecolor{shadecolor}{rgb}{1,1,1}%
+            \definecolor{framecolor}{rgb}{1,0,0}%
+        }
+    }{
+        \ifthenelse{\equal{#2}{filled}}{
+            \definecolor{shadecolor}{rgb}{.98,.98,1}%
+            \definecolor{framecolor}{rgb}{.1,.0,.7}%
+        }{
+            \definecolor{shadecolor}{rgb}{1,1,1}%
+            \definecolor{framecolor}{rgb}{.1,.0,.7}%
+        }
+    }
+	\hspace{4mm}\hspace{-2ex}\begin{minipage}{\textwidth-2ex}%
+    \begin{fshaded}%
+    \ifthenelse{\equal{#3}{}}{
+        \vspace{-0.3em}
+    }{%
+        \textsf{\textbf{#3}}%
+    }%
+
+    \vspace{.5em}
+}{
+    \end{fshaded}
+	\end{minipage}%
+}
+
+\renewcommand\emph[1]{\textcolor{TUMBlue}{#1}}
+%___________________

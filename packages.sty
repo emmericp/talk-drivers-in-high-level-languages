@@ -1,0 +1,101 @@
+\usepackage{xparse}		% for \DeclareDocumentCommand
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+
+\usepackage{trfsigns}	% for \laplace
+\usepackage{textcomp}
+\usepackage{gensymb}	% for \degree
+\usepackage{nicefrac}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{microtype}
+\usepackage{calc}
+\usepackage{standalone}
+\usepackage{qrcode}
+
+\usepackage{tikz}
+\usetikzlibrary[calc,shapes,arrows,positioning]
+
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+
+
+\usepackage{tumcolor}
+\usepackage{tumlogo}
+\usepackage{tumlang}
+\usepackage{tumcontact}
+\usepackage[noshading]{moeptikz}
+
+\usepackage[binary-units]{siunitx}
+\sisetup{
+    output-decimal-marker=\text{,},
+    detect-all=true,
+    per-mode=symbol-or-fraction
+}
+\DeclareSIUnit\bel{B}
+\DeclareSIUnit\snr{SNR}
+\DeclareSIUnit\baud{bd}
+\DeclareSIUnit\symbol{Symbol}
+\DeclareSIUnit\symbols{Symbole}
+
+\DeclareDocumentCommand{\code}{m}{%
+	\texttt{#1}%
+}
+
+\DeclareDocumentCommand{\opn}{m}{%
+	\operatorname{#1}%
+}
+
+
+% fonts
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[tx]{sfmath}
+\usepackage{helvet}
+\usepackage[scaled]{inconsolata}
+
+% Use cm sum
+% http://tex.stackexchange.com/questions/200910/replace-a-few-math-symbols-in-the-newtxmath-font
+\DeclareSymbolFont{largesymbolsCM}{OMX}{cmex}{m}{n}
+\let\txsum\sum
+\let\sum\relax
+\DeclareMathSymbol{\sum}{\mathop}{largesymbolsCM}{"50}
+
+%\renewcommand\rmdefault{ptm}%
+\renewcommand\sfdefault{phv}%
+\renewcommand{\@makefnmark}{\hbox{\textsuperscript{\scriptsize{\@thefnmark}}}}
+\newcommand{\mathbit}[1]{\boldsymbol{#1}}
+
+% Fix font scaling in beamer mode
+\let\Tiny=\tiny
+
+% Fix things like \overline and \hat for helvetika
+\let\phv@prime\prime
+\renewcommand{\prime}{^{\hskip.15ex\phv@prime}}
+
+\newlength{\tumbeamer@tmplen}
+\let\phv@hat\hat
+\renewcommand{\hat}[1]{%
+	\setlength{\tumbeamer@tmplen}{\widthof{#1}}%
+	\addtolength{\tumbeamer@tmplen}{\heightof{#1}}%
+	\setlength{\tumbeamer@tmplen}{.1\tumbeamer@tmplen}%
+	\kern\tumbeamer@tmplen\phv@hat{\kern-\tumbeamer@tmplen#1}%
+}
+\let\phv@overline\overline
+\renewcommand{\overline}[1]{%
+	\setlength{\tumbeamer@tmplen}{\widthof{#1}}%
+	\addtolength{\tumbeamer@tmplen}{\heightof{#1}}%
+	\setlength{\tumbeamer@tmplen}{.15\tumbeamer@tmplen}%
+	\kern\tumbeamer@tmplen\phv@overline{\kern-\tumbeamer@tmplen#1}%
+}
+
+\newcommand{\pr}[1]{\opn{Pr}\left[#1\right]}
+
+\newcommand{\pd@part}[2]{#1\hskip-.25ex#2\hskip.15ex}%
+\def\pd{\@ifstar{\pd@part{\hskip.3ex\partial}}{\pd@part{\hskip.2ex\opn{d}}}}
+

@@ -1,0 +1,63 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty} 
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+
+\node (nic1) [color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic2) [xshift=2.8333cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic3) [xshift=5.666cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic4) [xshift=8.5cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+
+\node (kernel) at (nic1.north west) [anchor=south west, color=white, fill=TUMLightBlue, rounded corners=.1ex, minimum width=10cm, minimum height = 3cm] {};
+\node (user) at (kernel.north) [yshift=0.1cm,anchor=south, color=white, fill=TUMLightBlue, rounded corners=.1ex, minimum width=10cm, minimum height = 2cm] {};
+
+\node at ([yshift=0cm] user.north west) [color=white, anchor=north west] {\textbf{User Space}};
+\node at ([yshift=0cm] kernel.north west) [color=white, anchor=north west] {\textbf{Kernel Space}};
+\node at ([yshift=0.05cm,xshift=0.25cm] kernel.north) [color=white, anchor=south east] {\footnotesize\textbf{Control API}};
+
+\node (driver) at ([xshift=.25cm,yshift=1cm] kernel.south) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Driver}};
+\node (driverX) at ([yshift=-0.5cm] driver.south) [anchor=south] {};
+%\node (driverr) at ([xshift=-.25cm,yshift=.25cm] nic1.north east) [anchor=south east, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Driver}};
+
+\node (dpdk) at ([yshift=.45cm] driver.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Magic Kernel Module}};
+%\node (os) at ([yshift=.25cm] driverr.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{OS}};
+
+%\node (ovs) at ([yshift=2cm] nic1.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Open vSwitch}};
+
+\node (app) at ([yshift=1cm] dpdk.north) [anchor=south, color=white, fill=TUMOrange, rounded corners=.1ex, minimum width=1.2cm, minimum height = .5cm] {\textbf{Magic Library}};
+\node (app2) at ([yshift=1.75cm] dpdk.north) [anchor=south, color=white, fill=TUMOrange, rounded corners=.1ex, minimum width=1.2cm, minimum height = .5cm] {\textbf{Application}};
+\node (noos) at ([yshift=0cm,xshift=-1cm] driver.west) [anchor=east, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=1.2cm, minimum height = .5cm] {\textbf{OS}};
+
+\node (mmap1) at ([yshift=.3cm,xshift=3.3cm] app) [densely dotted, ultra thick, fill=TUMLightBlue, draw=TUMBlue, rounded corners=.1ex, minimum width=2cm, minimum height =1.5cm] {};
+\node at ([yshift=.2cm,xshift=0.3cm] mmap1.south) [color=TUMBlue, anchor=south, text width=2cm] {\textbf{\texttt{mmap}}'ed\\\textbf{Memory}};
+
+\node (mmap2) at ([yshift=.3cm,xshift=3.3cm] driver) [densely dotted, ultra thick, fill=TUMLightBlue, draw=TUMBlue, rounded corners=.1ex, minimum width=2cm, minimum height =1.5cm] {};
+\node at ([yshift=.2cm,xshift=0.3cm] mmap2.south) [color=TUMBlue, anchor=south, text width=2cm] {\textbf{\texttt{mmap}}'ed\\\textbf{Memory}};
+
+
+\draw[ultra thick, color=TUMBlue] (driver.east) -- (driver.east -| mmap2.west);
+\draw[ultra thick, color=TUMBlue] (dpdk.east) -- (dpdk.east -| mmap2.west);
+\draw[ultra thick, color=TUMBlue] (mmap2.north) -- (mmap1.south);
+\draw[ultra thick, color=TUMBlue] (app.east) -- (app.east -| mmap1.west);
+\draw[ultra thick, color=TUMBlue] (app2.east) -- (app2.east -| mmap1.west);
+%\draw[ultra thick, color=TUMOrange] (ovs) -| (os);
+
+\draw[ultra thick, densely dotted, color=TUMOrange] (app.south) to (dpdk);
+\draw[ultra thick, color=TUMOrange] (app2.south) to (app);
+\draw[ultra thick, color=TUMOrange] (driver) -- (dpdk);
+\draw[ultra thick, color=TUMOrange] (driver) -- (driverX.south);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic1);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic2);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic3);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic4);
+
+%\draw[ultra thick, densely dotted, color=TUMOrange] (app.south) to[in=90, out=290] (ovs);
+%\draw[ultra thick, densely dotted, color=TUMOrange] (app.east) to[in=35, out=0] (os);
+
+\end{tikzpicture}
+
+\end{document}

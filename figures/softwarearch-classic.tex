@@ -1,0 +1,53 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty} 
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+
+\node (nic1) [color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic2) [xshift=2.5cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic3) [xshift=5cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+\node (nic4) [xshift=7.5cm, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=1.5cm, minimum height = .5cm] {\textbf{NIC}};
+
+\node (kernel) at (nic1.north west) [anchor=south west, color=white, fill=TUMLightBlue, rounded corners=.1ex, minimum width=9cm, minimum height = 3cm] {};
+\node (user) at (kernel.north) [yshift=0.1cm,anchor=south, color=white, fill=TUMLightBlue, rounded corners=.1ex, minimum width=9cm, minimum height = 2cm] {};
+
+\node at ([yshift=0cm] user.north west) [color=white, anchor=north west] {\textbf{User Space}};
+\node at ([yshift=0cm] kernel.north west) [color=white, anchor=north west] {\textbf{Kernel Space}};
+\node at ([yshift=0cm,xshift=-0.075cm] kernel.north) [color=white, anchor=south west] {\footnotesize\textbf{Socket API}};
+
+\node (driver) at ([xshift=.0,yshift=1cm] kernel.south) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Driver}};
+\node (driverX) at ([yshift=-0.5cm] driver.south) [anchor=south] {};
+%\node (driverr) at ([xshift=-.25cm,yshift=.25cm] nic1.north east) [anchor=south east, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Driver}};
+
+\node (dpdk) at ([yshift=.45cm] driver.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Operating System}};
+%\node (os) at ([yshift=.25cm] driverr.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{OS}};
+
+%\node (ovs) at ([yshift=2cm] nic1.north) [anchor=south, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{Open vSwitch}};
+
+\node (app) at ([yshift=1cm] dpdk.north) [anchor=south, color=white, fill=TUMOrange, rounded corners=.1ex, minimum width=1.2cm, minimum height = .5cm] {\textbf{Application}};
+
+%\node (vm) at ([yshift=.25cm] app) [densely dotted, ultra thick, fill=none, draw=TUMBlue, rounded corners=.1ex, minimum width=2cm, minimum height =1.5cm] {};
+%\node at ([yshift=-.2cm] vm.north) [color=TUMBlue, anchor=north] {\textbf{VM}};
+
+
+%\draw[ultra thick, color=TUMOrange] (ovs) -| (dpdk);
+%\draw[ultra thick, color=TUMOrange] (ovs) -| (os);
+
+\draw[ultra thick, densely dotted, color=TUMOrange] (app.south) to (dpdk);
+\draw[ultra thick, color=TUMOrange] (driver) -- (dpdk);
+\draw[ultra thick, color=TUMOrange] (driver) -- (driverX.south);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic1);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic2);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic3);
+\draw[ultra thick, color=TUMOrange] (driverX.south) -| (nic4);
+
+%\draw[ultra thick, densely dotted, color=TUMOrange] (app.south) to[in=90, out=290] (ovs);
+%\draw[ultra thick, densely dotted, color=TUMOrange] (app.east) to[in=35, out=0] (os);
+
+\end{tikzpicture}
+
+\end{document}

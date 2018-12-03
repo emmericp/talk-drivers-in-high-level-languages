@@ -1,0 +1,106 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumlang}[2016/03/18 TUM language]
+
+\RequirePackage[english,ngerman]{babel}
+\RequirePackage[english=usenglishmax,ngerman=ngerman-x-latest]{hyphsubst}
+
+
+% language options
+\DeclareOption{english}{
+	\AtEndOfPackage{\selectlanguage{english}}
+	\AtBeginDocument{\selectlanguage{english}}
+}
+\DeclareOption{german}{
+	\AtEndOfPackage{\selectlanguage{ngerman}}
+	\AtBeginDocument{\selectlanguage{ngerman}}
+}
+\DeclareOption{ngerman}{
+	\AtEndOfPackage{\selectlanguage{ngerman}}
+	\AtBeginDocument{\selectlanguage{ngerman}}
+}
+
+% general TUM option
+\DeclareOption{TUM}{
+	\def\TUMnameenglish{Technical University of Munich}
+	\def\TUMnamegerman{Technische Universit\"at M\"unchen}
+	\addto\captionsenglish{\def\TUMname{\TUMnameenglish}}
+	\addto\captionsngerman{\def\TUMname{\TUMnamegerman}}
+	\let\tumlang@departmentnameenglish\@undefined
+	\let\tumlang@departmentnamegerman\@undefined
+	\let\departmentlogo\@undefined
+	\let\tumlang@chairnameenglish\@undefined
+	\let\tumlang@chairnamegerman\@undefined
+	\let\chairhead\@undefined
+}
+
+% department options
+\newcommand{\tumlang@define@department}[3]
+{
+	\expandafter\def\csname#1nameenglish\endcsname{#2}
+	\expandafter\def\csname#1namegerman\endcsname{#3}
+	\addto\captionsenglish{\expandafter\def\csname#1name\endcsname{\csname#1nameenglish\endcsname}}
+	\addto\captionsngerman{\expandafter\def\csname#1name\endcsname{\csname#1namegerman\endcsname}}
+	\DeclareOption{#1}{
+		\ds@TUM
+		\def\departmentname{\csname#1name\endcsname}
+		\def\departmentlogo{\csname#1Logo\endcsname}
+	}
+}
+\tumlang@define@department{AR}{Department of Architecture}{Fakult\"at f\"ur Architektur}
+\tumlang@define@department{BGU}{Department of Civil, Geo and Environmental Engineering}{Ingenieurfakult\"at Bau Geo Umwelt}
+\tumlang@define@department{CH}{Department of Chemistry}{Fakult\"at f\"ur Chemie}
+\tumlang@define@department{EI}{Department of Electrical and Computer Engineering}{Fakult\"at f\"ur Elektrotechnik und Informationstechnik}
+\tumlang@define@department{HFP}{School of Politics}{Hochschule f\"ur Politik}
+\tumlang@define@department{IN}{Department of Informatics}{Fakult\"at f\"ur Informatik}
+\tumlang@define@department{MA}{Department of Mathematics}{Fakult\"at f\"ur Mathematik}
+\tumlang@define@department{MED}{School of Medicine}{Fakult\"at f\"ur Medizin}
+\tumlang@define@department{MW}{Department of Mechanical Engineering}{Fakult\"at f\"ur Maschinenwesen}
+\tumlang@define@department{PH}{Department of Physics}{Fakult\"at f\"ur Physik}
+\tumlang@define@department{SE}{School of Education}{School of Education}
+\tumlang@define@department{SP}{Department of Sport and Health Sciences}{Fakult\"at f\"ur Sport- und Gesundheitswissenschaften}
+\tumlang@define@department{WI}{School of Management}{Fakult\"at f\"ur Wirtschaftswissenschaften}
+\tumlang@define@department{WZW}{School of Life Sciences Weihenstephan}{Wissenschaftszentrum Weihenstephan f\"ur Ern\"ahrung, Landnutzung und Umwelt}
+
+% chair options
+\newcommand{\tumlang@define@chair}[5]
+{
+	\expandafter\def\csname#1nameenglish\endcsname{#3}
+	\expandafter\def\csname#1namegerman\endcsname{#4}
+	\addto\captionsenglish{\expandafter\def\csname#1name\endcsname{\csname#1nameenglish\endcsname}}
+	\addto\captionsngerman{\expandafter\def\csname#1name\endcsname{\csname#1namegerman\endcsname}}
+	\expandafter\def\csname#1head\endcsname{#5}
+	\DeclareOption{#1}{
+		\csname ds@#2\endcsname
+		\def\chairname{\csname#1name\endcsname}
+		\def\chairhead{\csname#1head\endcsname}
+	}
+}
+\tumlang@define@chair{NET}{IN}%
+	{Chair of Network Architectures and Services}%
+	{Lehrstuhl f\"ur Netzarchitekturen und Netzdienste}%
+	{Prof.~Dr.-Ing.\ Georg\ Carle}%
+\tumlang@define@chair{SEC}{IN}%
+	{Chair of IT Security}%
+	{Lehrstuhl f\"ur Sicherheit in der Informatik}%
+	{Prof.~Dr.\ Claudia\ Eckert}%
+\tumlang@define@chair{OS}{IN}%
+	{Chair of Operating Systems}%
+	{Lehrstuhl f\"ur Betriebssysteme}%
+	{Prof.~Dr.\ Uwe\ Baumgarten}%
+\tumlang@define@chair{SWT}{IN}%
+	{Chair of Applied Software Engineering}%
+	{Lehrstuhl f\"ur Angewandte Softwaretechnik}%
+	{Prof.~Bernd\ Br\"ugge,~Ph.\,D.}%
+
+\tumlang@define@chair{MSV}{EI}%
+	{Fachgebiet Methoden der Signalverarbeitung}%
+	{Fachgebiet Methoden der Signalverarbeitung}%
+	{Univ.-Prof.~Dr.-Ing.\ Wolfgang\ Utschick}%
+
+% unknown options
+\DeclareOption*{}
+
+\ExecuteOptions{ngerman,TUM}
+\ProcessOptions\relax
+
+\endinput
