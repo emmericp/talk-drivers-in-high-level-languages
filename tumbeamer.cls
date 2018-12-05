@@ -190,11 +190,9 @@
 
 \defbeamertemplate{footline}{tumfootline}{%
     \hspace{\tumbeamer@logoheight}%
-    \hfill\insertshortauthor\tumbeamer@sep\insertshorttitle%
+    \insertshortauthor\tumbeamer@sep\insertshorttitle%
     \ifnoframenumbers\relax\else%
-    \makebox[1.897\tumbeamer@logoheight]{%
-        \hfill\bfseries\insertframenumber%
-    }%
+    \hfill\bfseries\insertframenumber%
     \fi%
     \hspace{\tumbeamer@logoheight}%
     \vspace{\tumbeamer@logoheight}%

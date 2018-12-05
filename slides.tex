@@ -1,4 +1,4 @@
-\documentclass[NET,english,aspectratio=169]{tumbeamer}
+\documentclass[NET,english,aspectratio=169,notitleframe]{tumbeamer}
 
 %settings
 \usepackage[utf8]{inputenc}
@@ -70,41 +70,149 @@
 
 
 % For beamer mode (default):
-\author{Paul Emmerich}
-\title{Demystifying Network Cards}
-\date{December 27, 2017}
+ % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
+\author[Paul Emmerich, Simon Ellmann et al.]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger, Thomas Günzel, Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
+\title{Safe and Secure Drivers in High-Level Languages}
+\date{December 29, 2018}
 
 \begin{document}
 
-\begin{frame}{About me}
-\begin{tikzpicture}[remember picture,overlay]
-    \node[xshift=-2.5cm,yshift=-3cm] at (current page.north east) {\includegraphics[width=0.2\textwidth]{pics/me.jpg}};
-\end{tikzpicture}
-\begin{itemize}
-\item PhD student at Technical University of Munich
-\item Researching performance of software packet processing systems
-\item Mostly working on my packet generator MoonGen
-\begin{itemize}
-\item<2-> Lightning talk about packet generators on Saturday
-\end{itemize}
-\end{itemize}
-\pause
-\begin{tikzpicture}[remember picture,overlay]
-    \node[xshift=-2.5cm,yshift=2cm] at (current page.south east) {\includegraphics[width=0.2\textwidth]{pics/moongenlogo.pdf}};
-\end{tikzpicture}
+\setbeamertemplate{footline}{}
+  \begin{frame}[c,noframenumbering]
+%    \begin{tikzpicture}[overlay,remember picture]
+%      \node[opacity=0.5,anchor=south east] at ($(current page.south east)+(-1,-1)$) {%
+%    \includegraphics[width=.4\textwidth]{pics/TUM_Uhrenturm.png}};
+%  \end{tikzpicture}
+  \centering%
+  \Large%
+  \strut\textcolor{TUMBlue}{\inserttitle}%
+  \\[4ex]%
+  \normalsize%
+  \strut\insertauthor%
+  \\[2ex]%
+  \footnotesize%
+  \insertdate%
+  \\[4ex]%
+  \ifdefined\departmentname%
+    \ifdefined\chairname%
+      \chairname\\%
+    \fi%
+    \departmentname\\%
+  \fi%
+  \TUMname\\%
 \end{frame}
 
-%\begin{frame}{Network Interface Card (NIC)}
-%\centering\includegraphics[width=0.66\textwidth]{pics/nic1}
-%\end{frame}
+  \begin{frame}[c,noframenumbering]
+%    \begin{tikzpicture}[overlay,remember picture]
+%      \node[opacity=0.5,anchor=south east] at ($(current page.south east)+(-1,-1)$) {%
+%    \includegraphics[width=.4\textwidth]{pics/TUM_Uhrenturm.png}};
+%  \end{tikzpicture}
+  \centering%
+  \Large%
+  \strut\textcolor{TUMBlue}{\inserttitle}%
+  \\[4ex]%
+  \normalsize%
+  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$, Thomas Günzel$^5$, Stefan Huber$^6$,  Maximilian Pudelko$^7$, Maximilian Stadlmeier$^8$, Sebastian Voit$^9$\normalfont %
+  \\[2ex]%
+  \footnotesize%
+  $^1$C, thesis advisor\hspace{1em}
+  $^2$Rust\hspace{1em}
+  $^3$OCaml\hspace{1em}
+  $^4$Haskell\hspace{1em}
+  $^5$Swift\hspace{1em}
+  $^6$IOMMU\hspace{1em}
+  $^7$VirtIO driver\hspace{1em}
+  $^8$C\#\hspace{1em}
+  $^9$Go
+  \\[4ex]%
+    \ifdefined\departmentname%
+    \ifdefined\chairname%
+      \chairname\\%
+    \fi%
+    \departmentname\\%
+  \fi%
+  \TUMname\\%
+\end{frame}
+\setbeamertemplate{footline}[tumfootline]
 
-\begin{frame}{Network Interface Card (NIC)}
+
+\begin{frame}{Drivers}
 \centering\includegraphics[width=0.66\textwidth]{pics/nic2}
 \end{frame}
 
-\begin{frame}{Network Interface Card (NIC)}
+\begin{frame}{Drivers}
 \centering\includegraphics[width=0.66\textwidth]{pics/nic3}
 \end{frame}
+
+\begin{frame}{PCIe basics}
+\end{frame}
+
+\begin{frame}{User space drivers}
+\end{frame}
+
+\begin{frame}{Network drivers}
+\end{frame}
+
+\begin{frame}{Why? Performance!}
+\end{frame}
+
+\begin{frame}{Why? Features!}
+\end{frame}
+
+\begin{frame}{Reference implementation: C}
+\end{frame}
+
+\begin{frame}{Expectation: beautiful code}
+\end{frame}
+
+\begin{frame}{Reality}
+container\_of macro goes here
+\end{frame}
+
+\begin{frame}{ALL THE LANGUAGES!!!1}
+\end{frame}
+
+
+\begin{frame}{Rust}
+\end{frame}
+
+\begin{frame}{Go}
+\end{frame}
+
+\begin{frame}{C\#}
+\end{frame}
+
+\begin{frame}{Swift}
+\end{frame}
+
+\begin{frame}{OCaml}
+\end{frame}
+
+\begin{frame}{Haskell}
+\end{frame}
+
+\begin{frame}{Look ma, no root}
+\end{frame}
+
+\begin{frame}{Restricting devices with the IOMMU}
+\end{frame}
+
+\begin{frame}{Performance comparison}
+\end{frame}
+
+\begin{frame}{Garbage collection and JIT compilation vs. latency}
+\end{frame}
+
+\begin{frame}{Conclusion: Check out our code}
+%\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
+\begin{itemize}
+\item Meta-repository with links: \url{https://github.com/ixy-languages/ixy-languages}
+\item Drivers are simple: don't be afraid of them
+\item No kernel code needed :)
+\end{itemize}
+%\centering \Huge Q \& A
+\end{frame}
+
 
 
 \begin{frame}{What I care about}
