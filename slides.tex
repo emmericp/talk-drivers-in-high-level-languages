@@ -71,7 +71,7 @@
 
 % For beamer mode (default):
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
-\author[Paul Emmerich, Simon Ellmann et al.]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger, Thomas Günzel, Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
+\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
 \title{Safe and Secure Drivers in High-Level Languages}
 \date{December 29, 2018}
 
@@ -135,49 +135,168 @@
 \end{frame}
 \setbeamertemplate{footline}[tumfootline]
 
-
-\begin{frame}{Drivers}
-\centering\includegraphics[width=0.66\textwidth]{pics/nic2}
+\begin{frame}{About us}
+% FIXME: use columns for images?
+\begin{tikzpicture}[remember picture,overlay]
+	\node[xshift=-2.5cm,yshift=-3cm] at (current page.north east) {\includegraphics[width=0.2\textwidth]{pics/paul.jpg}};
+%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.south east) {\includegraphics[width=0.2\textwidth]{pics/simon.jpg}};
+\end{tikzpicture}
+\emph{Paul}
+\begin{itemize}
+\item PhD student at Technical University of Munich
+\item Researching performance of software packet processing systems
+\end{itemize}
+\vfill
+\emph{Simon}
+\begin{itemize}
+\item HiWi/Research assistant
+\item Rust driver as bachelor's thesis
+\end{itemize}
+\emph{Everyone else}
+\begin{itemize}
+\item Did a bachelor's thesis, master's thesis or other project with Paul as advisor
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Drivers}
+
+\begin{frame}{Network drivers}
 \centering\includegraphics[width=0.66\textwidth]{pics/nic3}
 \end{frame}
 
+\begin{frame}{The ixy project}
+\begin{itemize}
+\item Attempt to write a simple yet fast user space network driver
+\item It's a user space driver you can easily understand and read
+\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
+\item Supports Intel ixgbe NICs (82599, X540, Xeon D, ...)
+\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
+\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Expectation: Beautiful C code}
+\begin{itemize}
+\item Why write a driver in C?
+\pause
+\vspace{1em}
+\item Most drivers are written in C
+\item C is the lowest common denominator of systems programming languages
+\item Everyone can read C?
+\item C code can be beautiful
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Reality: C can be ugly}
+\begin{minted}[autogobble]{c}
+#define mystery_macro(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Reality: C can be ugly}
+\begin{minted}[autogobble]{c}
+#define container_of(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\end{frame}
+
+
+\begin{frame}[fragile]{Reality: C can be ugly}
+\begin{minted}[autogobble]{c}
+#define container_of(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\begin{itemize}
+\item Allows some ``inheritance'' in C to abstract driver implementations
+\item Virtually all C drivers use this macro
+\item The Linux kernel contains $\approx$ 15,000 uses of this macro
+\end{itemize}
+\end{frame}
+
+
+%\setbeamertemplate{footline}{}
+\begin{frame}{Reality: C can cause security problems}
+%\centering\includegraphics[width=0.65\textwidth]{pics/cve}\\
+%\footnotesize bla subtitle
+\begin{itemize}
+\item blah biscuit paper \footnote{Biscuit}
+\item ?? bugs
+\item 40 due to memory safety
+\vspace{1em}
+\item How many of these are in drivers?
+\pause
+\item 39 are in drivers
+\item (13 of these in Qualcomm WiFi driver)
+\end{itemize}
+\end{frame}
+%\setbeamertemplate{footline}[tumfootline]
+
+\begin{frame}{Should you really write new code in C in 2019?}
+\begin{itemize}
+\item If you have a choice: probably not, no
+\pause
+\item User space drivers can be written in \emph{any} language!
+\item But are all languages an equally good choice?
+\item Can high-level languages prevent bugs?
+\item Is a JIT compiler or a garbage collector a problem in a driver?
+\end{itemize}
+\end{frame}
+
+\setbeamertemplate{footline}{}
+\begin{frame}{}
+\centering\includegraphics[width=0.65\textwidth]{pics/allthe1}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.65\textwidth]{pics/allthe2}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.85\textwidth]{pics/theses}
+\end{frame}
+\setbeamertemplate{footline}[tumfootline]
+
+
 \begin{frame}{PCIe basics}
-\end{frame}
-
-\begin{frame}{User space drivers}
-\end{frame}
-
-\begin{frame}{Network drivers}
-\end{frame}
-
-\begin{frame}{Why? Performance!}
-\end{frame}
-
-\begin{frame}{Why? Features!}
-\end{frame}
-
-\begin{frame}{Reference implementation: C}
-\end{frame}
-
-\begin{frame}{Expectation: beautiful code}
-\end{frame}
-
-\begin{frame}{Reality}
-container\_of macro goes here
-\end{frame}
-
-\begin{frame}{ALL THE LANGUAGES!!!1}
+\begin{itemize}
+\item MMIO
+\item DMA
+\item Interrupts
+\end{itemize}
 \end{frame}
 
 
-\begin{frame}{Rust}
+
+\begin{frame}{How to write a user space driver in 4 simple steps}
+\begin{itemize}
+\item[1.] Unload kernel driver
+\item[2.] \texttt{mmap} the PCIe MMIO address space
+\item[3.] Figure out physical addresses for DMA
+\item[4.] Write the driver
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Go}
+
+\begin{frame}{Challenges for high-level languages}
+\begin{itemize}
+\item Access to \texttt{mmap} with the proper flags
+\item Handle externally allocated memory in the language
+\item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
+\item Memory access semantics: memory barriers, volatile read/writes
+\vspace{1em}
+\pause
+\item high-level unsafe blabla
+\end{itemize}
 \end{frame}
+
+
 
 \begin{frame}{C\#}
 \end{frame}
@@ -191,10 +310,10 @@ container\_of macro goes here
 \begin{frame}{Haskell}
 \end{frame}
 
-\begin{frame}{Look ma, no root}
+\begin{frame}{Go}
 \end{frame}
 
-\begin{frame}{Restricting devices with the IOMMU}
+\begin{frame}{Rust}
 \end{frame}
 
 \begin{frame}{Performance comparison}
@@ -202,6 +321,27 @@ container\_of macro goes here
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
 \end{frame}
+
+
+\begin{frame}{Restricting devices with the IOMMU}
+\end{frame}
+
+\begin{frame}{Look ma, no root}
+\end{frame}
+
+
+\begin{frame}{Why to write a user space network driver?}
+\end{frame}
+
+\begin{frame}{(Maybe) network stack of the future}
+\end{frame}
+
+\begin{frame}{Why? Features!}
+\end{frame}
+
+\begin{frame}{Example: hardware timestamping}
+\end{frame}
+
 
 \begin{frame}{Conclusion: Check out our code}
 %\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
@@ -212,6 +352,16 @@ container\_of macro goes here
 \end{itemize}
 %\centering \Huge Q \& A
 \end{frame}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -251,16 +401,16 @@ Buzzwords: Network Function Virtualization, Service Function Chaining
 \end{frame}
 
 \begin{frame}{Example application}
-\centering\includestandalone{figures/softwarearch-simple}
+%\centering\includestandalone{figures/softwarearch-simple}
 \end{frame}
 
 
 \begin{frame}{Normal applications}
-\centering\includestandalone{figures/softwarearch-classic}
+%\centering\includestandalone{figures/softwarearch-classic}
 \end{frame}
 
 \begin{frame}{What it really looks like}
-\centering\includestandalone{figures/softwarearch-dragons}
+%\centering\includestandalone{figures/softwarearch-dragons}
 \end{frame}
 
 \begin{frame}{Performance}
@@ -319,7 +469,7 @@ New problems:
 
 
 \begin{frame}{Do more in user space?}
-\centering\includestandalone{figures/softwarearch-moreuserspace}
+%\centering\includestandalone{figures/softwarearch-moreuserspace}
 \end{frame}
 
 \begin{frame}{User space packet processing frameworks}
@@ -346,7 +496,7 @@ Examples for such frameworks
 \end{frame}
 
 \begin{frame}{Do even more in user space?}
-\centering\includestandalone{figures/softwarearch-fulluserspace}
+%\centering\includestandalone{figures/softwarearch-fulluserspace}
 \end{frame}
 
 \begin{frame}{User space driver frameworks}
@@ -373,58 +523,6 @@ Examples for such frameworks
 \end{itemize}
 \end{frame}
 
-\begin{frame}{What has the kernel ever done for us?}
-\begin{itemize}
-\item<1-> Lots of mature drivers
-\item<2-> Protocol implementations that actually work (TCP, ...)
-\item<3-> Interrupts (NAPI is quite nice)
-\item<3-> Stable user space APIs
-\item<3-> Access for multiple applications at the same time
-\item<3-> Firewalling, routing, eBPF, XDP, ...
-\item<3-> ...and more
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Are these frameworks fast?}
-\begin{itemize}
-\item<1-> Typical performance target: $\approx$ 5 to 10\,Mpps per CPU core for simple forwarding
-\item<1-> 5 to 10\,Mpps $=$ \emph{300 to 600 cycles} per packet at 3\,GHz
-\vspace{1em}
-\item<2-> Time to receive a packet in DPDK: $\approx \emph{50}$ \emph{cycles}
-\item<2-> Time to send a packet in DPDK: $\approx \emph{50}$ \emph{cycles}
-\item<2-> Other user space frameworks play in the same league
-\vspace{1em}
-\item<2-> Single-core forwarding with Open vSwitch on DPDK: $\approx$ 13\,Mpps (2\,Mpps without)
-\item<2-> Performance gains from: batching (typically 16 to 64 packets/batch), reduced memory overhead (no \texttt{sk\_buff})
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Usage}
-Lots of packet processing apps have support for DPDK today:
-\begin{itemize}
-\item Open vSwitch
-\item Vyatta
-\item Juniper's vMX
-\item Cisco's VPP
-\item pfSense (soon)
-\end{itemize}
-Main reasons: performance and control over hardware features
-\end{frame}
-
-\begin{frame}{Can we build our own user space driver?}
-Sure, but why?
-\begin{itemize}
-\item For fun \cancel{and profit}
-\item To understand how NIC drivers work
-\item To understand how user space packet processing frameworks work
-\begin{itemize}
-\item Many people see these frameworks as magic black boxes
-\item DPDK drivers: $\ge$ 20k lines of code per driver
-\end{itemize}
-\item How hard can it be?
-\item Turns out it's quite easy, I've written my driver Ixy in less than 1000 lines of C
-\end{itemize}
-\end{frame}
 
 \begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
 \begin{itemize}
@@ -439,15 +537,6 @@ Sure, but why?
 \end{itemize}
 \end{frame}
 
-\begin{frame}{How to build a full user space driver in 4 simple steps}
-\begin{itemize}
-\item[1.] Unload kernel driver
-\item[2.] \texttt{mmap} the PCIe MMIO address space
-\item[3.] Figure out physical addresses for DMA
-%\item<2->[4.] Write the driver
-\item[4.] Write the driver
-\end{itemize}
-\end{frame}
 
 \newmintinline[ccode]{c}{}
 \newmintinline[bashcode]{c}{}
@@ -487,183 +576,9 @@ echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
 	uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
 	                                     MAP_SHARED, fd, 0);
 \end{minted}
-%\begin{itemize}
-%\item \ccode{asdf hi}
-%\item \ccode|asdf|
-%\item \mintinline{c}{hi}
-%\end{itemize}
-\end{frame}
-
-\begin{frame}{Device registers}
-\centering\includegraphics[width=0.75\textwidth]{pics/registers}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Access registers: LEDs}
-\begin{minted}[autogobble]{c}
-#define LEDCTL 0x00200
-#define LED0_BLINK_OFFS 7
-
-uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
-*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
-\end{minted}
-\begin{itemize}
-\item Memory-mapped IO: all memory accesses go directly to the NIC
-\item One of the very few valid uses of \ccode{volatile} in C
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{How are packets handled?}
-\begin{itemize}
-\item Packets are transferred via DMA (Direct Memory Access)
-\item DMA transfer is initiated by the NIC
-\vspace{1em}
-\item Packets are transferred via queue interfaces (often called rings)
-\item NICs have multiple receive and transmit queues
-\begin{itemize}
-\item Modern NICs have 128 to 768 queues
-\item This is how NICs scale to multiple CPU cores
-\item Similar queues are also used in GPUs and NVMe disks
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Rings/Queues}
-\begin{itemize}
-\item Specific to \texttt{ixgbe}, but most NICs are similar
-\item Rings are circular buffers filled with DMA descriptors
-\begin{itemize}
-\item DMA descriptors are 16 bytes: 8 byte physical pointer, 8 byte metadata
-\item Translate virtual addresses to physical addresses using \texttt{/proc/self/pagemap}
-\end{itemize}
-\vspace{1em}
-\item<2-> Queue of DMA descriptors is accessed via DMA
-\item<2-> Queue index pointers (head \& tail) available via registers for synchronization
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Ring memory layout}
-\centering\hspace{1cm}\includegraphics[width=0.75\textwidth]{pics/ring}
-\end{frame}
-
-\begin{frame}{Receiving packets}
-\begin{itemize}
-\item Tell NIC via MMIO the location and size of the ring
-\item Fill DMA descriptors with pointers to allocated memory
-\end{itemize}
-\pause
-\begin{itemize}
-\item NIC writes a packet via DMA and increments the head pointer
-\item NIC also sets a status flag in the DMA descriptor once it's done
-\begin{itemize}
-\item Checking the status flag is way faster than reading the MMIO-mapped RDH register
-\end{itemize}
-\pause
-\item Periodically poll the status flag
-\item Process the packet
-\item Reset the DMA descriptor, allocate a new packet or recycle
-\item Adjust tail pointer (RDT) register
-\end{itemize}
-\end{frame}
-
-\begin{frame}{What now?}
-\begin{itemize}
-\item Transmit rings work the same way
-\item There's also a lot of boring initialization code in Ixy
-\end{itemize}
-\pause
-Ideas for things to test with Ixy
-\begin{itemize}
-\item Performance: why are these frameworks faster than the Kernel?
-\item Obscure hardware/offloading features
-\item Security features: what about the IOMMU?
-\item Other NICs, other programming languages
-\end{itemize}
 \end{frame}
 
 
-\begin{frame}{Conclusion: Check out ixy}
-\centering \qrcode[height=3cm]{https://github.com/emmericp/ixy}
-\begin{itemize}
-\item Check out ixy on GitHub: \url{https://github.com/emmericp/ixy} (BSD license)
-\item $\le$ 1000 lines of C code for the full framework
-\begin{itemize}
-	\item C is the lowest common denominator of programming languages
-\end{itemize}
-\item Drivers are simple: don't be afraid of them. You can write them in any language!
-\item No kernel code needed :)
-\end{itemize}
-%\centering \Huge Q \& A
-\end{frame}
-
-\begin{frame}{Backup slides}
-\vfill
-\centering \huge Backup Slides
-\vfill
-\end{frame}
-
-\begin{frame}{Linux kernel: past, present, and future}
-\emph{Past}
-\begin{itemize}
-\item Linux 2.4 suffered from problems when moving to 1\,Gbit/s networks
-\item One interrupt per packet, servers live-locking under interrupt load
-\end{itemize}
-\emph{Present}
-\begin{itemize}
-\item Linux 2.6 added NAPI
-\item Dynamic disabling of interrupts, batched receiving
-\item Lots of optimizations in the socket API
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Linux kernel: past, present, and future}
-\emph{Present/Future}
-\begin{itemize}
-\item Hottest Linux networking feature: eXpress Data Path (XDP)
-\item Run packet processing code in a fast path in the kernel using eBPF programs
-\begin{itemize}
-\item Restrictions apply, typically programmed in a restricted subset of C
-\end{itemize}
-\item Good integration with the kernel
-\begin{itemize}
-\item Ideal for firewall applications for user space programs on the same host
-\end{itemize}
-\item<2-> Requires driver support (new memory model) and exclusive NIC access
-\item<2-> DPDK supports more NICs than XDP (as of Kernel 4.15)
-\item<2-> Work-in-progress, still lacks many features
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Setting up a receive ring: code}
-\begin{minted}[autogobble]{c}
-#define RING_ENTRIES 512
-size_t ring_size = RING_ENTRIES * sizeof(struct dma_desc);
-struct dma_desc* ring_mem = (struct dma_desc*) malloc(ring_size);
-set_reg(RDBAL_0, virt2phy(ring_mem));       // dma descriptor ring location
-set_reg(RDBAH_0, virt2phy(ring_mem >> 32)); // dma descriptor ring location
-set_reg(RDLEN_0, ring_size);                // dma descriptor size
-for (int i = 0; i < RING_ENTRIES; i++) {
-	ring_mem[i].dma_ptr = malloc(2048); // NIC will store packet here
-}
-set_reg(RDH_0, 0);            // head pointer
-set_reg(RDT_0, RING_ENTRIES); // tail pointer: rx ring starts out full
-\end{minted}
-\footnotesize{(Simplified, can't use \ccode{malloc()} because the memory needs to be physically contiguous, real code uses hugetlbfs)}
-\end{frame}
-
-
-
-%\section{Example Measurements}
-%\input{include/measurements}
-
-%\section{P4}
-%\input{include/p4}
-
-% Comment out if you do not want a bibliography
-%\printbibheading[title={Bibliography},heading=bibnumbered]
-%\setbeamertemplate{bibliography item}[text]
-%\begin{frame}[allowframebreaks]
-%\printbibliography[heading=none]
-%\end{frame}
 
 \end{document}
 
