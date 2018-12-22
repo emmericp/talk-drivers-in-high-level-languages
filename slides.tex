@@ -302,6 +302,9 @@
 \end{frame}
 
 \begin{frame}{Swift}
+%\centering\includestandalone[scale=0.79]{figures/benchmarks-swift-alone}
+%\centering\includestandalone[scale=0.82]{figures/benchmarks-swift-with-c}
+%\centering\includestandalone[scale=0.77]{figures/benchmarks-swift-batching}
 \end{frame}
 
 \begin{frame}{OCaml}
@@ -314,9 +317,93 @@
 \end{frame}
 
 \begin{frame}{Rust}
+\begin{itemize}
+\item compiled systems programming language
+\item aims to be memory safe (especially regarding concurency), i.e.
+\begin{itemize}
+\item no race conditions,
+\item no dangling pointers,
+\item no undefined behaviour,
+\item ...
+\end{itemize}
+\item unique ownership system and ruleset for moving/borrowing values
+%\item highly efficient through zero-cost abstractions
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Rust's Ownership System}
+\begin{itemize}
+\item Three simple rules:
+\begin{itemize}
+\item Each value has a variable that is its owner.
+\item There can only be one owner at a time.
+\item When the owner goes out of scope, the value is freed.
+\end{itemize}
+\item Rules are enforced at compile-time
+\item Ownership can be passed to another variable% by
+%\begin{itemize}
+%\item ``moving'' the value or by
+%\item ``borrowing'' it through a reference
+%\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Rust: Safe vs. Unsafe}
+\begin{itemize}
+\item not everything can be done in safe Rust
+\item calling foreign functions and dereferencing raw pointers is always unsafe
+\item many functions in Rust's standard library make use of unsafe code
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Rust}
+\begin{itemize}
+\item biggest challenge: memory handling inside and outside the driver
+\end{itemize}
+\begin{minted}{c}
+fn set_reg32(&self, reg: u32, val: u32) {
+  assert!(
+    reg as usize <= self.len - 4 as usize,
+    "memory access out of bounds"
+  );
+
+  unsafe {
+    ptr::write_volatile((self.addr as usize + reg as usize) as *mut u32, val);
+  }
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Rust}
+% TODO: some packet code or graphic? forwarder?
+\begin{itemize}
+\item look at this nice code ...
+\end{itemize}
+\begin{minted}{c}
+fn set_reg32(&self, reg: u32, val: u32) {
+  assert!(
+    reg as usize <= self.len - 4 as usize,
+    "memory access out of bounds"
+  );
+
+  unsafe {
+    ptr::write_volatile((self.addr as usize + reg as usize) as *mut u32, val);
+  }
+}
+\end{minted}
 \end{frame}
 
 \begin{frame}{Performance comparison}
+\centering\includestandalone[scale=0.82]{figures/benchmarks-all-throughput}
+\end{frame}
+
+\begin{frame}{Performance comparison}
+% TODO: observations and reasons/speculations for good/bad performance?
+\begin{itemize}
+\item Rust's throughput close to C, safe wrappers lead to more memory operations
+\item Swift performs incredibly poor
+\item ...
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}

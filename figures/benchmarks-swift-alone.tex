@@ -1,0 +1,36 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty}
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+	\begin{axis}[
+		ybar,
+		ymin=0,
+		width=12cm,
+		height=8cm,
+		bar width=40pt,
+		ylabel={Million Packets per Second (Single Device)},
+		nodes near coords,
+		symbolic x coords={Standard array, Fixed array, Unmanaged objects},
+		xtick = data,
+		x tick label style={
+		/pgf/number format/1000 sep=},
+		every node near coord/.append style={
+			/pgf/number format/fixed zerofill,
+			/pgf/number format/fixed
+		},
+		legend pos=outer north east,
+		legend cell align={left},
+		enlarge x limits=0.25,
+		enlarge y limits={value=0.2,upper}%,
+	]
+		\addplot coordinates {(Standard array, 0.07) (Fixed array, 0.06) (Unmanaged objects, 0.07)};
+		\addplot coordinates {(Standard array, 1.32) (Fixed array, 0.9) (Unmanaged objects, 1.23)};
+		\legend{Debug, Release}
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}

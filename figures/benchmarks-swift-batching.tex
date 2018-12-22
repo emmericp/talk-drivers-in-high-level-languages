@@ -1,0 +1,45 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty}
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+	\begin{axis}[
+		width=12cm,
+		height=8cm,
+		xlabel={Batch Size},
+		ylabel={Million Packets per Second (per Device)},
+		xmin=0, xmax=280,
+		xtick={16,32,64,128,256},
+		legend pos=outer north east,
+		legend cell align={left},
+		ymajorgrids=true,
+		grid style=dashed,
+	]
+
+		\addplot[
+			color=blue,
+			mark=square,
+			]
+			coordinates {
+				(16, 0.33) (32, 0.37) (64, 0.36) (128, 0.38) (256, 0.41) %0.38
+			};
+
+		\addplot[mark=none, blue, samples=2, dashed] coordinates {(0, 0.38) (280, 0.38)};
+
+		\addplot[
+			color=red,
+			mark=square,
+			]
+			coordinates {
+				(16, 2.55) (32, 2.63) (64, 2.72) (128, 2.75) (256, 2.77)  %2.63
+			};
+
+		\legend{Debug, Debug (No Batch), Release, Release (No Batch)}
+		\addplot[mark=none, red, samples=2, dashed] coordinates {(0,2.63) (280,2.63)};
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}
