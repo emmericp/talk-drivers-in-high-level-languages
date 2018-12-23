@@ -71,7 +71,7 @@
 
 % For beamer mode (default):
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
-\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
+\author[Paul Emmerich, Simon Ellmann, Sebastian Voit]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, \textbf{Sebastian Voit},\\ Fabian Bonk, Alex Egger, Alexander Frank, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier}
 \title{Safe and Secure Drivers in High-Level Languages}
 \date{December 29, 2018}
 
@@ -112,18 +112,19 @@
   \strut\textcolor{TUMBlue}{\inserttitle}%
   \\[4ex]%
   \normalsize%
-  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$, Thomas Günzel$^5$, Stefan Huber$^6$,  Maximilian Pudelko$^7$, Maximilian Stadlmeier$^8$, Sebastian Voit$^9$\normalfont %
+  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Sebastian Voit$^3$,\\ Fabian Bonk$^4$, Alex Egger$^5$, Alexander Frank$^6$, Thomas Günzel$^7$,\\ Stefan Huber$^8$, Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$ \normalfont %
   \\[2ex]%
   \footnotesize%
   $^1$C, thesis advisor\hspace{1em}
   $^2$Rust\hspace{1em}
-  $^3$OCaml\hspace{1em}
-  $^4$Haskell\hspace{1em}
-  $^5$Swift\hspace{1em}
-  $^6$IOMMU\hspace{1em}
-  $^7$VirtIO driver\hspace{1em}
-  $^8$C\#\hspace{1em}
-  $^9$Go
+  $^3$Go\hspace{1em}
+  $^4$OCaml\hspace{1em}
+  $^5$Haskell\hspace{1em}\\
+  $^6$Latency measurements\hspace{1em}
+  $^7$Swift\hspace{1em}
+  $^8$IOMMU\hspace{1em}
+  $^9$VirtIO driver\hspace{1em}
+  $^{10}$C\#\hspace{1em}
   \\[4ex]%
     \ifdefined\departmentname%
     \ifdefined\chairname%
@@ -136,31 +137,43 @@
 \setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{About us}
-% FIXME: use columns for images?
-\begin{tikzpicture}[remember picture,overlay]
-	\node[xshift=-2.5cm,yshift=-3cm] at (current page.north east) {\includegraphics[width=0.2\textwidth]{pics/paul.jpg}};
-%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.south east) {\includegraphics[width=0.2\textwidth]{pics/simon.jpg}};
-\end{tikzpicture}
+\begin{columns}
+\begin{column}{0.8\textwidth}
 \emph{Paul}
 \begin{itemize}
 \item PhD student at Technical University of Munich
-\item Researching performance of software packet processing systems
+\item Researching performance of packet processing systems
 \end{itemize}
 \vfill
 \emph{Simon}
 \begin{itemize}
-\item HiWi/Research assistant
+\item Rust driver as bachelor's thesis, now HiWi/research assistant
+\end{itemize}
+\emph{Sebastian}
+\begin{itemize}
 \item Rust driver as bachelor's thesis
 \end{itemize}
 \emph{Everyone else}
 \begin{itemize}
-\item Did a bachelor's thesis, master's thesis or other project with Paul as advisor
+\item Did a thesis with Paul as advisor
 \end{itemize}
+\end{column}
+\begin{column}{0.15\textwidth}
+%\begin{tikzpicture}[remember picture,overlay]
+%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.north east) {\includegraphics[width=0.2\textwidth]{pics/paul.jpg}};
+%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.south east) {\includegraphics[width=0.2\textwidth]{pics/simon.jpg}};
+\includegraphics[width=0.8\textwidth]{pics/paul.jpg}\\
+\includegraphics[width=0.8\textwidth]{pics/simon.jpg}\\
+\includegraphics[width=0.8\textwidth]{pics/sebastian.jpg}
+%\end{tikzpicture}
+\end{column}
+\end{columns}
 \end{frame}
 
 
 \begin{frame}{Network drivers}
-\centering\includegraphics[width=0.66\textwidth]{pics/nic3}
+\centering\includegraphics[width=0.60\textwidth]{pics/nic3}\\
+\vspace{-1em}\tiny{Intel XL710 [Picture: Intel.com]}
 \end{frame}
 
 \begin{frame}{The ixy project}
