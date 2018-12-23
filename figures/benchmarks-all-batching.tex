@@ -1,0 +1,103 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty}
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+	\definecolor{c}{RGB}{85,85,85}
+	\definecolor{csharp}{RGB}{23,134,0}
+	\definecolor{go}{RGB}{55,94,171}
+	\definecolor{rust}{RGB}{222,165,132}
+	\definecolor{swift}{RGB}{255,172,69}
+
+	\begin{axis}[
+		height=6cm,
+		width=14cm,
+		grid=major,
+		xlabel={Batch Size},
+		ylabel={Packet Rate in Mpps},
+		ymin=0,
+		ymax=35,
+		xmin=1,
+		xmax=256,
+		xmode=log,
+		log basis x={2},
+		log ticks with fixed point,
+		x tick label style={/pgf/number format/1000 sep=\,},
+		legend cell align={left},
+		legend pos=outer north east,
+		%legend style={at={(0.02,0.80)},anchor=north west}
+	]
+
+		\draw [line width=0.02cm,dashed] (1,29.76) -- (256,29.76) node [midway,above]{Line Rate};
+
+		\addplot[c,mark=*] coordinates {
+			(1,4.1)
+			(2,7.6)
+			(4,11.3)
+			(8,14.8)
+			(16,15.6)
+			(32,16.3)
+			(64,17.2)
+			(128,17.3)
+			(256,17.5)
+		};
+		\addlegendentry{C}
+
+		\addplot[csharp,mark=triangle*] coordinates {
+			(1,1.4)
+			(2,2.6)
+			(4,5.0)
+			(8,7.6)
+			(16,10.4)
+			(32,12.4)
+			(64,14.3)
+			(128,15.0)
+			(256,15.6)
+		};
+		\addlegendentry{C\#}
+
+		\addplot[go,mark=diamond*] coordinates {
+			(1,1.7)
+			(2,3.1)
+			(4,5.4)
+			(8,8.1)
+			(16,10.3)
+			(32,12.2)
+			(64,13.2)
+			(128,13.3)
+			(256,13.4)
+		};
+		\addlegendentry{Go}
+
+		\addplot[rust,mark=square*] coordinates {
+			(1,3.4)
+			(2,6.0)
+			(4,9.5)
+			(8,12.4)
+			(16,13.5)
+			(32,14.7)
+			(64,15.4)
+			(128,16.1)
+			(256,16.2)
+		};
+		\addlegendentry{Rust}
+
+		\addplot[swift,mark=*] coordinates {
+			(1,0.4)
+			(2,0.8)
+			(4,1.2)
+			(8,1.6)
+			(16,2.5)
+			(32,2.6)
+			(64,2.7)
+			(128,2.8)
+			(256,2.8)
+		};
+		\addlegendentry{Swift}
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}
