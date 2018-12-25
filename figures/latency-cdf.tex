@@ -1,0 +1,38 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{tumcolors}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=0.9}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=9.6cm,
+	height=5.75cm,
+	xmin=0, xmax=40,
+	ymin=0, ymax=1,
+	grid=major,
+	ylabel={CDF},
+	xlabel={Latency [$\mu$s]},
+	max space between ticks=20,
+%	ytick ={516, 520, 524},
+%	xtick={0, 20.16, 40.032, 60.48, 80.64, 100.86},
+	legend style={font=\fontsize{8}{9}\selectfont},
+	tick label style={font=\fontsize{8}{9}\selectfont},
+	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={Rust, C\#},
+	legend pos = south east
+]
+\addplot [mark=none,color=TUMDarkerBlue, thick] table[col sep=comma,x=lat,y=cdf] {latency-rust.csv};
+\addplot [mark=none,color=TUMOrange, thick] table[col sep=comma,x=lat, y=cdf] {latency-cs.csv};
+\end{axis}
+\end{tikzpicture}
+\end{document}

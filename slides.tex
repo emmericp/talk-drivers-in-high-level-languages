@@ -1,4 +1,4 @@
-\documentclass[NET,english,aspectratio=169,notitleframe]{tumbeamer}
+\documentclass[NET,english,aspectratio=169,notitleframe,draft]{tumbeamer}
 
 %settings
 \usepackage[utf8]{inputenc}
@@ -181,9 +181,22 @@
 \item Attempt to write a simple yet fast user space network driver
 \item It's a user space driver you can easily understand and read
 \item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
-\item Supports Intel ixgbe NICs (82599, X540, Xeon D, ...)
+\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
 \item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
 \item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
+\begin{itemize}
+\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
+\item Commonly found in servers or as on-board chips
+\item Very good datasheet publicly available
+\vspace{1em}
+\item Almost no logic hidden behind black-box firmware
+%\item<2-> Black-box firmware contains almost no magic
+\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
+\item<2-> Here: all hardware features directly exposed to the driver
 \end{itemize}
 \end{frame}
 
@@ -195,8 +208,8 @@
 \vspace{1em}
 \item Most drivers are written in C
 \item C is the lowest common denominator of systems programming languages
-\item Everyone can read C?
 \item C code can be beautiful
+\item Everyone can read C?
 \end{itemize}
 \end{frame}
 
@@ -233,23 +246,52 @@
 \end{itemize}
 \end{frame}
 
+\begin{frame}{C can cause security problems}
+\centering\includegraphics[trim={0 13cm 0 0},clip,width=0.65\textwidth]{pics/cve}
 
-%\setbeamertemplate{footline}{}
-\begin{frame}{Reality: C can cause security problems}
-%\centering\includegraphics[width=0.65\textwidth]{pics/cve}\\
-%\footnotesize bla subtitle
+\footnotesize (...)
+
+\centering\includegraphics[trim={0 0 0 17.5cm},clip,width=0.65\textwidth]{pics/cve}
+
 \begin{itemize}
-\item blah biscuit paper \footnote{Biscuit}
-\item ?? bugs
-\item 40 due to memory safety
-\vspace{1em}
-\item How many of these are in drivers?
+\item Screenshot from \url{https://www.cvedetails.com/}
+\item Security bugs found in the Linux kernel in the last $\approx$ 20 years
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{C can cause security problems}
+\begin{itemize}
+\item Not all bugs can be blamed on the language
+\item Cutler et al. analyzed 65 CVEs categorized as code execution in the Linux kernel \footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018}
+\end{itemize}
 \pause
-\item 39 are in drivers
-\item (13 of these in Qualcomm WiFi driver)
+\begin{table}
+\centering
+\begin{tabular}{ l  r r l }
+  \toprule
+  Bug type & Num. & Perc. & Can be avoided by language? \\
+  \midrule
+  Various & 11 & 17\% & Unclear/Maybe \\
+  Logic & 14 & 22\% & No \\
+  Use-after-free & 8 & 12\% & Yes \\
+  Out of bounds & 32 & 49\% & Yes (likely leads to panic) \\
+  \bottomrule  
+\end{tabular}
+\caption{Code execution vulnerabilities in the Linux kernel identified by Cutler et al$^1$}
+\end{table}
+\end{frame}
+
+\begin{frame}{Are there preventable bugs in drivers?}
+\begin{itemize}
+\item We looked at these 40 preventable bugs
+\pause
+\item 39 of them were in drivers (the other was in the Bluetooth stack)
+\pause
+\item 13 were in the Qualcomm WiFi driver
 \end{itemize}
 \end{frame}
-%\setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Should you really write new code in C in 2019?}
 \begin{itemize}
@@ -257,7 +299,6 @@
 \pause
 \item User space drivers can be written in \emph{any} language!
 \item But are all languages an equally good choice?
-\item Can high-level languages prevent bugs?
 \item Is a JIT compiler or a garbage collector a problem in a driver?
 \end{itemize}
 \end{frame}
@@ -277,17 +318,56 @@
 \setbeamertemplate{footline}[tumfootline]
 
 
-\begin{frame}{PCIe basics}
-\begin{itemize}
-\item MMIO
-\item DMA
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item Memory-mapped IO (MMIO)
+\item Direct memory access (DMA)
 \item Interrupts
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item Memory-mapped IO (MMIO)
+\begin{itemize}
+\item Magic memory area that is mapped to the device
+\item Memory reads/writes are directly forwarded to the device
+\item Usually used to expose device registers
+\item User space drivers: \texttt{mmap} a magic file
 \end{itemize}
+\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
+\item[\color{TUMLightGray}3.] {\color{TUMLightGray} Interrupts}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
+\item[2.] Direct memory access (DMA)
+\begin{itemize}
+\item Allows the device to read/write \emph{arbitrary} memory locations
+\item User space drivers: figure out physical addresses, tell the device to write there
+\end{itemize}
+\item[\color{TUMLightGray}3.] {\color{TUMLightGray}  Interrupts}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
+\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
+\item[3.] Interrupts
+\begin{itemize}
+\item This is how the device informs you about events
+\item User space drivers: available via the Linux \texttt{vfio} subsystem
+\item (Usually) not useful for high-speed network drivers 
+\item We'll ignore interrupts here
+\end{itemize}
+\end{enumerate}
 \end{frame}
 
 
-
-\begin{frame}{How to write a user space driver in 4 simple steps}
+\begin{frame}{Basics: How to write a user space driver in 4 simple steps}
 \begin{itemize}
 \item[1.] Unload kernel driver
 \item[2.] \texttt{mmap} the PCIe MMIO address space
@@ -297,15 +377,81 @@
 \end{frame}
 
 
+
+
+\newmintinline[ccode]{c}{}
+\newmintinline[bashcode]{c}{}
+
+\begin{frame}[fragile=singleslide]{Find the device we want to use}
+\begin{Verbatim}[commandchars=\\\{\}]
+# lspci
+03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\end{Verbatim}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Find the device we want to use}
+\begin{Verbatim}[commandchars=\\\{\}]
+# lspci
+\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\end{Verbatim}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Unload the kernel driver}
+\begin{minted}{bash}
+echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe configuration address space from user space}
+\begin{minted}[autogobble]{c}
+int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
+struct stat stat;
+fstat(fd, &stat);
+uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
+                                     MAP_SHARED, fd, 0);
+\end{minted}
+\end{frame}
+
+\begin{frame}{Device registers}
+\centering\includegraphics[width=0.75\textwidth]{pics/registers}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Access registers: LEDs}
+\begin{minted}[autogobble]{c}
+#define LEDCTL 0x00200
+#define LED0_BLINK_OFFS 7
+
+uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
+*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
+\end{minted}
+\begin{itemize}
+\item Memory-mapped IO: all memory accesses go directly to the NIC
+\item One of the very few valid uses of \ccode{volatile} in C
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Handling packets via DMA}
+\begin{itemize}
+\item Packets are transferred via queue interfaces (often called rings)
+\item Rings are configured via MMIO and accessed via by the device DMA
+\item Rings (usually) contain pointers to packets, also accessed via DMA
+\pause
+\vspace{1em}
+\item Details vary between different devices
+\item This is not unique to NICs: most PCIe devices work in a similar manner
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Challenges for high-level languages}
 \begin{itemize}
 \item Access to \texttt{mmap} with the proper flags
 \item Handle externally allocated memory in the language
 \item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
-\item Memory access semantics: memory barriers, volatile read/writes
-\vspace{1em}
-\pause
-\item high-level unsafe blabla
+\item Memory access semantics: memory barriers, volatile reads/writes
 \end{itemize}
 \end{frame}
 
@@ -478,7 +624,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 
 
 \begin{frame}{Conclusion: Check out our code}
-%\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
+\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
 \begin{itemize}
 \item Meta-repository with links: \url{https://github.com/ixy-languages/ixy-languages}
 \item Drivers are simple: don't be afraid of them
@@ -488,229 +634,6 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{frame}
 
 
-
-
-
-
-
-
-
-
-
-
-
-\begin{frame}{What I care about}
-\centering\begin{tikzpicture}[scale=1.35]
-	\foreach \x in {1,2,...,7} {
-		\pgfmathparse{40 - \x*5}\let\layershade\pgfmathresult
-		\pgfmathparse{\x/2}\let\y\pgfmathresult
-		\def\layercolor{TUMDarkerBlue}
-		\draw[line width=.5pt,fill=\layercolor!\layershade]
-			(0,\y) rectangle ($(4,\y+0.5)$);
-
-	}
-	\foreach \x in {1,2,...,7} {
-		\node at (0.17,0.25+\x*0.5) {\fontsize{5}{6}\selectfont\bf \x};
-	}
-	\node at (2,0.75) {\fontsize{7}{8}\selectfont Physical};
-	\node at (2,1.25) {\fontsize{7}{8}\selectfont Data Link};
-	\node at (2,1.75) {\fontsize{7}{8}\selectfont Network};
-	\node at (2,2.25) {\fontsize{7}{8}\selectfont \cancel{Transport}};
-	\node at (2,2.75) {\fontsize{7}{8}\selectfont \cancel{Session}};
-	\node at (2,3.25) {\fontsize{7}{8}\selectfont \cancel{Presentation}};
-	\node at (2,3.75) {\fontsize{7}{8}\selectfont \cancel{Application}};
-\end{tikzpicture}
-\end{frame}
-
-
-\begin{frame}{Not all apps run on top of HTTP}
-Lots of network functionality is moving from specialized hardware to software:
-\begin{itemize}
-\item Routers
-\item (Virtual) Switches
-\item Firewalls
-\item Middleboxes
-\end{itemize}
-Buzzwords: Network Function Virtualization, Service Function Chaining
-\end{frame}
-
-\begin{frame}{Example application}
-%\centering\includestandalone{figures/softwarearch-simple}
-\end{frame}
-
-
-\begin{frame}{Normal applications}
-%\centering\includestandalone{figures/softwarearch-classic}
-\end{frame}
-
-\begin{frame}{What it really looks like}
-%\centering\includestandalone{figures/softwarearch-dragons}
-\end{frame}
-
-\begin{frame}{Performance}
-\begin{itemize}
-\item Packets per second on a 10\,Gbit/s link: up to \emph{14.88\,Mpps}
-\item<2-> Packets per second on a 100\,Gbit/s link: up to \emph{148.8\,Mpps}
-\item<3-> Clock cycles per packet on a 3\,GHz CPU with 14.88\,Mpps: $\approx 200$ cycles
-\item<3-> Typical performance target: $\approx$ 5 to 10\,Mpps per CPU core for simple forwarding
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Performance: User space app}
-\begin{itemize}
-\item<1-> Typical performance target: $\approx$ 5 to 10\,Mpps per CPU core for simple forwarding
-\item<1-> 5 to 10\,Mpps $=$ \emph{300 to 600 cycles} per packet at 3\,GHz
-\vspace{1em}
-\item<2-> Time to cross the user space boundary: very very long
-\vspace{1em}
-\item<3-> Single-core forwarding performance with sockets: $\approx$ 0.3\,Mpps
-\item<3-> Single-core forwarding performance with libpcap: $\approx$ 1\,Mpps
-%\item Latency of a typical hardware switch: $\le 1\,\mu s$
-%\item Latency of a hardware switch: $\le 1\,\mu s$
-\end{itemize}
-\end{frame}
-
-%\begin{frame}{Performance dragons?}
-%\centering\includestandalone{figures/softwarearch-dragons}
-%\end{frame}
-
-\begin{frame}{Move the application into the kernel}
-\centering\includestandalone{figures/softwarearch-kernel}
-\end{frame}
-
-\begin{frame}{Move the application into the kernel}
-New problems:
-\begin{itemize}
-\item Cumbersome to develop
-\item Usual kernel restrictions (e.g., C as programming language)
-\item Application can (and will) crash the kernel
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Performance: Kernel app}
-\begin{itemize}
-\item<1-> Typical performance target: $\approx$ 5 to 10\,Mpps per CPU core for simple forwarding
-\item<1-> 5 to 10\,Mpps $=$ \emph{300 to 600 cycles} per packet at 3\,GHz
-\vspace{1em}
-\item<2-> Time to receive a packet in the Linux kernel: $\approx \emph{500}$ \emph{cycles}
-\item<3-> Time to send a packet in the Linux kernel: $\approx \emph{440}$ \emph{cycles}
-\item<4-> Time to allocate, initialize, and free a \texttt{sk\_buff} in the Linux kernel: $\approx \emph{400}$ \emph{cycles}
-\vspace{1em}
-\item<5-> Single-core forwarding performance with Open vSwitch: $\approx$ 2\,Mpps
-\item<5-> Hottest topic in the Linux kernel: XDP, which fixes some of these problems
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Do more in user space?}
-%\centering\includestandalone{figures/softwarearch-moreuserspace}
-\end{frame}
-
-\begin{frame}{User space packet processing frameworks}
-Examples for such frameworks
-\begin{itemize}
-\item netmap
-\item PF\_RING ZC
-\item pfq
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Problems}
-\begin{itemize}
-\item Non-standard API, custom kernel module required
-\item Most frameworks require patched drivers
-\item Exclusive access to the NIC for one application
-\item No access to the usual kernel features
-\begin{itemize}
-\item Limited support for kernel integration in netmap
-\end{itemize}
-\item Poor support for hardware offloading features of NICs
-\item Framework needs explicit support for each NIC, limited to a few NICs
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Do even more in user space?}
-%\centering\includestandalone{figures/softwarearch-fulluserspace}
-\end{frame}
-
-\begin{frame}{User space driver frameworks}
-Examples for such frameworks
-\begin{itemize}
-\item DPDK
-\item Snabb
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Problems}
-\begin{itemize}
-\item Non-standard API
-\item Exclusive access to the NIC for one application
-\item Framework needs explicit support for each NIC model
-\begin{itemize}
-\item DPDK supports virtually all $\ge$ 10\,Gbit/s NICs
-\end{itemize}
-\item Limited support for interrupts
-\begin{itemize}
-\item Interrupts not considered useful at $\ge$ 0.1\,Mpps
-\end{itemize}
-\item No access to the usual kernel features
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
-\begin{itemize}
-\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
-\item Commonly found in servers or as on-board chips
-\item Very good datasheet publicly available
-%\vspace{1em}
-\item Almost no logic hidden behind black-box firmware
-%\item<2-> Black-box firmware contains almost no magic
-%\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
-%\item<2-> Here: all hardware features directly exposed to the driver
-\end{itemize}
-\end{frame}
-
-
-\newmintinline[ccode]{c}{}
-\newmintinline[bashcode]{c}{}
-
-\begin{frame}[fragile=singleslide]{Find the device we want to use}
-\begin{Verbatim}[commandchars=\\\{\}]
-# lspci
-03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\end{Verbatim}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Find the device we want to use}
-\begin{Verbatim}[commandchars=\\\{\}]
-# lspci
-\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\end{Verbatim}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Unload the kernel driver}
-\begin{minted}{bash}
-echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
-\end{minted}
-%\begin{itemize}
-%\item \ccode{asdf hi}
-%\item \ccode|asdf|
-%\item \mintinline{c}{hi}
-%\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe configuration address space from user space}
-\begin{minted}[autogobble]{c}
-	int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
-	struct stat stat;
-	fstat(fd, &stat);
-	uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
-	                                     MAP_SHARED, fd, 0);
-\end{minted}
-\end{frame}
 
 
 

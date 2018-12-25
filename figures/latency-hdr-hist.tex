@@ -1,0 +1,43 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{tumcolors}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=0.9}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=9cm,
+	height=6cm,
+%	xmode=log,
+	x dir=reverse,
+	xmode=log,
+	xmin=0, xmax=1,
+	ymin=0, ymax=210,
+	grid=major,
+	xlabel={Percentile},
+	xtick={1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000002},
+	minor xtick={.9, .8, .7, .6, .5, .4, .3, .2, .09, .08, .07, .06, .05, .04, .03, .02, .009, .008, .007, .006, .005, .004, .003, .002, .0009, .0008, .0007, .0006, .0005, .0004, .0003, .0002, .00009, .00008, .00007, .00006, .00005, .00004, .00003, .00002, .000009, .000008, .000007, .000006, .000005, .000004, .000003, .000002},
+	xticklabels={0, 90, 99, 99.9, 99.99, 99.999, {}, Max},
+	ylabel={Latency [$\mu$s]},
+%	ytick ={516, 520, 524},
+%	xtick={0, 20.16, 40.032, 60.48, 80.64, 100.86},
+	legend style={font=\fontsize{8}{9}\selectfont},
+	tick label style={font=\fontsize{8}{9}\selectfont},
+	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={Rust, C\#},
+	legend pos = north west
+]
+\addplot [mark=none,color=TUMDarkerBlue,thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {latency-rust.csv};
+\addplot [mark=none,color=TUMOrange,thick] table[col sep=comma,y=lat, x expr=1-\thisrow{cdf}] {latency-cs.csv};
+\end{axis}
+\end{tikzpicture}
+\end{document}
