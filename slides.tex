@@ -314,12 +314,42 @@
 \end{frame}
 
 \begin{frame}{Go}
+\begin{itemize}
+\item Compiled programming language developed by Google 
+\item General purpose language but designed for distributed systems
+\item<2-> A driver is not a distributed system
+\item<3-> Then why even use Go?
+\begin{itemize}
+\item<4-> Runtime for:\\Garbage Collection\\Memory \& Type safety
+%\item<4-> Simple yet powerful concurrency via goroutines	%not relevant ofr a single core driver
+\item<4-> Large standard library
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Go for Drivers}
+\begin{itemize}
+\item Actually a lot like C in many aspects
+%maybe include some code examples?
+\item<2-> Main differences:
+\begin{itemize}
+\item<2-> No pointer arithmetic (managing DMA memory)
+\item<2-> No volatile (memory barriers for register access)
+\end{itemize}
+\item<3-> What we do instead:
+\begin{itemize}
+\item<3-> Manage DMA memory via slices
+\item<3-> Unsafe pointers: circumvent runtime\\
+	$\rightarrow$ Physical address calculation \& with atomic.Load/Store register access
+\item<3-> Ruleset for unsafe pointers to still be valid
+\end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Rust}
 \begin{itemize}
 \item compiled systems programming language
-\item aims to be memory safe (especially regarding concurency), i.e.
+\item aims to be memory safe (especially regarding concurrency), i.e.
 \begin{itemize}
 \item no race conditions,
 \item no dangling pointers,
