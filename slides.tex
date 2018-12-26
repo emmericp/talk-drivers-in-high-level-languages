@@ -151,7 +151,7 @@
 \end{itemize}
 \emph{Sebastian}
 \begin{itemize}
-\item Rust driver as bachelor's thesis
+\item Go driver as bachelor's thesis
 \end{itemize}
 \emph{Everyone else}
 \begin{itemize}
@@ -569,9 +569,78 @@ public unsafe void WriteData(uint offset, int val) {
 \item<3-> What we do instead:
 \begin{itemize}
 \item<3-> Manage DMA memory via slices
-\item<3-> Unsafe pointers: circumvent runtime\\
-	$\rightarrow$ Physical address calculation \& with atomic.Load/Store register access
+\item<3-> Unsafe pointers: circumvent runtime but allow arbitrary pointer\\
+	$\rightarrow$ Physical address calculation \& register access
 \item<3-> Ruleset for unsafe pointers to still be valid
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Managing Memory: Mempools}
+\begin{itemize}
+\item syscall.Mmap() returns slice of the mmapped memory area
+\item For this presentation: slice = fancy array\\
+	$\rightarrow$ bounds checked, subslicing, etc.
+\end{itemize}
+%\end{frame}
+
+%\begin{frame}[fragile]{func MemoryAllocateMempool}
+%mempool alloc code
+\begin{minted}[autogobble]{go}
+//allocate DMA memory & initialize mempool
+for i := uint32(0); i < numEntries; i++ {
+	mempool.packetBuf[i] = &PktBuf{
+		Pkt:        mempool.buf[i*entrySize : (i+1)*entrySize],
+		PhyAddr:    uint64(virtToPhys(uintptr(
+			    unsafe.Pointer(&mempool.buf[i*entrySize])))),
+	}
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{No volatile no problem}
+\begin{itemize}
+\item Easy solution for (pci) files: fd.Sync():
+\end{itemize}
+\begin{minted}[autogobble]{go}
+func readIo32(fd *os.File, offset uint) uint32 {
+	fd.Sync()
+	b := make([]byte, 4)
+	n, err := fd.ReadAt(b, int64(offset))
+	//check err
+	return binary.[Big|Little]Endian.Uint32(b)
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{No volatile no problem}
+%insert code registers
+\begin{itemize}
+\item Slightly more creativity needed for DMA memory:
+\end{itemize}
+\begin{minted}[autogobble]{go}
+func setReg32(addr []byte, reg int, value uint32) {
+	atomic.StoreUint32((*uint32)(unsafe.Pointer(&addr[reg])), value)
+}
+
+func getReg32(addr []byte, reg int) uint32 {
+	return atomic.LoadUint32((*uint32)(unsafe.Pointer(&addr[reg])))
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}{Conclusion Go}
+\begin{itemize}
+\item Actually quite nice to work with
+\begin{itemize}
+\item Safety (see Cutler et al.)
+\item Looks like C in beautiful
+\end{itemize}
+\item<2-> But
+\begin{itemize}
+\item<2-> approx 10\% slower then C at optimum batch size
+\item<2-> Needs higher batch sizes to be efficient
+\item<2-> Descriptor access can be ugly (functions on descriptors are too costly)
 \end{itemize}
 \end{itemize}
 \end{frame}
