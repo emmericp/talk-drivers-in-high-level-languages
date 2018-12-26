@@ -1,4 +1,4 @@
-\documentclass[NET,english,aspectratio=169,notitleframe,draft]{tumbeamer}
+\documentclass[NET,english,aspectratio=169,notitleframe]{tumbeamer}
 
 %settings
 \usepackage[utf8]{inputenc}
@@ -159,9 +159,6 @@
 \end{itemize}
 \end{column}
 \begin{column}{0.15\textwidth}
-%\begin{tikzpicture}[remember picture,overlay]
-%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.north east) {\includegraphics[width=0.2\textwidth]{pics/paul.jpg}};
-%	\node[xshift=-2.5cm,yshift=-3cm] at (current page.south east) {\includegraphics[width=0.2\textwidth]{pics/simon.jpg}};
 \includegraphics[width=0.8\textwidth]{pics/paul.jpg}\\
 \includegraphics[width=0.8\textwidth]{pics/simon.jpg}\\
 \includegraphics[width=0.8\textwidth]{pics/sebastian.jpg}
@@ -304,6 +301,7 @@
 \end{frame}
 
 \setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
 \centering\includegraphics[width=0.65\textwidth]{pics/allthe1}
 \end{frame}
@@ -315,6 +313,7 @@
 \begin{frame}{}
 \centering\includegraphics[width=0.85\textwidth]{pics/theses}
 \end{frame}
+\setbeamertemplate{headline}[tumheadline]
 \setbeamertemplate{footline}[tumfootline]
 
 
@@ -464,7 +463,10 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \end{itemize}
 \end{frame}
 
-
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 \begin{frame}{}
 \centering \scalebox{4}{\Huge C\#}
 \end{frame}
@@ -514,34 +516,154 @@ public unsafe void WriteData(uint offset, int val) {
 %\end{itemize}
 %\end{frame}
 
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
 \centering\includegraphics[width=0.8\textwidth]{pics/swift}
 \end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Swift}
+\begin{itemize}
+\item No, we didn't develop a macOS/iOS driver
+\item Swift is also available on Linux
+\pause
+\vspace{1em}
+\item Compiled via LLVM
+\item Memory management via reference counting (ARC)
+\item Memory safe (mostly)
+%\pause
+%\vspace{1em}
+%\item Access to external memory via \texttt{UnsafeBufferPointer} 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Swift: Pointers}
+\begin{itemize}
+\item \texttt{UnsafeBufferPointer} wraps a foreign memory blob
+\item Used to make packets in DMA buffers available
+\end{itemize}
+\begin{minted}[autogobble]{swift}
+public var packetData: UnsafeBufferPointer<UInt8>? {
+    get {
+        return UnsafeBufferPointer<UInt8>(
+            start: self.entry.pointer.assumingMemoryBound(to: UInt8.self),
+            count: Int(self.size)
+        )
+    }
+}
+\end{minted}
+\begin{itemize}
+\item Forces you to specify the memory size, accesses then check the bounds
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Swift: Pointers with a very verbose syntax}
+\begin{itemize}
+\item Example: modify one byte in a packet (part of our benchmark)
+\end{itemize}
+\begin{minted}[autogobble]{swift}
+public func touch() {
+    let ptr = self.entry.pointer
+    var newValue: UInt32 = ptr.load(fromByteOffset: 0, as: UInt32.self)
+    newValue += 1
+    ptr.storeBytes(of: newValue, toByteOffset: 0, as: UInt32.self)
+}
+\end{minted}
+\begin{itemize}
+\item Quite verbose compared to C or C\#
+\end{itemize}
 \end{frame}
 
 
 
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
 \centering\includegraphics[width=0.8\textwidth]{pics/ocaml}
 \end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
-\begin{frame}{Ocaml}
+\begin{frame}{OCaml}
+\begin{itemize}
+\item Compiled language
+\item Memory management via garbage collection
+\item Memory safe
+%\pause
+%\vspace{1em}
+%\item Access to external memory via \texttt{UnsafeBufferPointer} 
+\end{itemize}
 \end{frame}
 
 
+\begin{frame}[fragile]{OCaml: Cstruct}
+\begin{minted}[autogobble]{ocaml}
+[%%cstruct
+  type adv_rxd_wb = {
+    pkt_info : uint16;
+    hdr_info : uint16;
+    ip_id : uint16;
+    csum : uint16;
+    status_error : uint32;
+    length : uint16;
+    vlan : uint16
+  } [@@little_endian]
+]
+\end{minted}
+\begin{itemize}
+\item Cstruct generates code to work with (foreign) memory that looks like this
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{OCaml: It looks quite different}
+\begin{itemize}
+\item Code that checks how many packets are ready to be read in the receive ring
+\end{itemize}
+\begin{minted}[autogobble]{ocaml}
+let num_done =
+  let rec loop offset =
+    let rxd = descriptors.(wrap_rx (rxq.rx_index + offset)) in
+    if Int32.((get_adv_tx_wb_status rxd) land RXD.stat_dd <> 0l) then
+      loop (offset + 1)
+    else
+      offset in
+  loop 0
+\end{minted}
+\end{frame}
+
+
+%\begin{frame}[fragile]{OCaml: It looks quite different}
+%\begin{itemize}
+%\item Example of the forwarder application on top of the driver
+%\end{itemize}
+%\begin{minted}[autogobble]{ocaml}
+%let forward rx_dev tx_dev =
+%  let rx = Ixy.rx_batch rx_dev 0 in
+%  Ixy.tx_batch_busy_wait tx_dev 0 rx
+%\end{minted}
+%\end{frame}
+
+
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
-\centering\includegraphics[width=0.8\textwidth]{pics/haskell}
+\centering\includegraphics[width=0.6\textwidth]{pics/haskell}
 \end{frame}
-
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Haskell}
 \end{frame}
 
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
 \centering\includegraphics[width=0.8\textwidth]{pics/go}
 \end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Go}
 \begin{itemize}
@@ -645,9 +767,13 @@ func getReg32(addr []byte, reg int) uint32 {
 \end{itemize}
 \end{frame}
 
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
 \begin{frame}{}
-\centering\includegraphics[width=0.8\textwidth]{pics/rust}
+\centering\includegraphics[height=0.87\textheight]{pics/rust}
 \end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Rust}
 \begin{itemize}
@@ -754,11 +880,11 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{frame}
 
 
-\begin{frame}{Why to write a user space network driver?}
+\begin{frame}{Why write a user space network driver?}
 \end{frame}
 
-\begin{frame}{(Maybe) network stack of the future}
-\end{frame}
+%\begin{frame}{(Maybe) network stack of the future}
+%\end{frame}
 
 \begin{frame}{Why? Features!}
 \end{frame}
