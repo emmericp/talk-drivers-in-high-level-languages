@@ -823,29 +823,28 @@ func getReg32(addr []byte, reg int) uint32 {
 \setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Rust}
+\emph{What is Rust?}\\
+\begin{quote}
+A safe, concurrent, practical systems language.
+\end{quote}\\
+Great! That's what we are looking for! Anything else we need to know?\\
 \begin{itemize}
-\item compiled systems programming language
-\item aims to be memory safe (especially regarding concurrency), i.e.
-\begin{itemize}
-\item no race conditions,
-\item no dangling pointers,
-\item no undefined behaviour,
-\item ...
-\end{itemize}
-\item unique ownership system and ruleset for moving/borrowing values
-%\item highly efficient through zero-cost abstractions
+\item No garbage collector
+\item Unique ownership system and rules for moving/borrowing values
+\item Unsafe mode
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Rust's Ownership System}
+\begin{frame}{Safety in Rust: The Ownership System}
 \begin{itemize}
-\item Three simple rules:
+%\item Immutability of variables by default
+\item Three rules:
 \begin{itemize}
 \item Each value has a variable that is its owner.
 \item There can only be one owner at a time.
 \item When the owner goes out of scope, the value is freed.
 \end{itemize}
-\item Rules are enforced at compile-time
+\item Rules enforced at compile-time
 \item Ownership can be passed to another variable% by
 %\begin{itemize}
 %\item ``moving'' the value or by
@@ -854,15 +853,20 @@ func getReg32(addr []byte, reg int) uint32 {
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Rust: Safe vs. Unsafe}
+\begin{frame}[fragile]{Safety in Rust: Unsafe Code}
 \begin{itemize}
-\item not everything can be done in safe Rust
-\item calling foreign functions and dereferencing raw pointers is always unsafe
-\item many functions in Rust's standard library make use of unsafe code
+\item Not everything can be done in safe Rust
+\item Calling foreign functions and dereferencing raw pointers is always unsafe
+\item Many functions in Rust's standard library make use of unsafe code
 \end{itemize}
+\begin{minted}{c}
+unsafe {
+  println!("Your uid is {}.", libc::getuid());
+}
+\end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Rust}
+\begin{frame}[fragile]{Rust by Example}
 \begin{itemize}
 \item biggest challenge: memory handling inside and outside the driver
 \end{itemize}
@@ -880,7 +884,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Rust}
+\begin{frame}[fragile]{Rust by Example}
 % TODO: some packet code or graphic? forwarder?
 \begin{itemize}
 \item look at this nice code ...
