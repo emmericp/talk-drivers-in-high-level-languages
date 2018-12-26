@@ -376,9 +376,6 @@
 \end{itemize}
 \end{frame}
 
-
-
-
 \newmintinline[ccode]{c}{}
 \newmintinline[bashcode]{c}{}
 
@@ -452,24 +449,98 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \item Handle externally allocated memory in the language
 \item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
 \item Memory access semantics: memory barriers, volatile reads/writes
+\item Some operations in drivers are inherently unsafe
 \end{itemize}
 \end{frame}
 
 
+\begin{frame}{Goals for our implementations}
+\begin{itemize}
+\item Implement the same feature set as my C reference driver
+\item Use a similar structure like the C driver
+\item Write idiomatic code for the selected language
+\item Use language safety features where possible
+\item Quantify trade-offs for performance vs. safety
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{}
+\centering \scalebox{4}{\Huge C\#}
+\end{frame}
+
 
 \begin{frame}{C\#}
+\begin{itemize}
+\item No, we didn't develop a Windows driver
+\item We used Microsoft's CoreCLR on Linux
+\pause
+\vspace{1em}
+\item JIT compiled
+\item Garbage collected
+\item Memory safe (mostly)
+\pause
+\vspace{1em}
+\item C\# supports a relatively obscure \emph{unsafe mode}
+\item Unsafe mode features full support for pointers
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{C\#: Access to external memory}
+\begin{itemize}
+\item C\# provides \texttt{UnmanagedMemoryStream}, a nice wrapper for foreign memory
+\item But it was too slow :(
+\pause
+\item Use unsafe raw pointers for packet buffers instead
+\end{itemize}
+\begin{minted}[autogobble]{csharp}
+public unsafe void WriteData(uint offset, int val) {
+    if (offset >= BUF_SIZE) throw new IndexOutOfRangeException();
+    int *ptr = (int*)(_baseAddress + DataOffset + offset);
+    *ptr = val;
+}
+\end{minted}
+\begin{itemize}
+\pause
+\item Looks a lot like C
+\item Potentially unsafe operations are all in a few known places, simpler auditing
+\end{itemize}
+\end{frame}
+
+
+%\begin{frame}[]{C\#: Summary}
+%\begin{itemize}
+%\item ???
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.8\textwidth]{pics/swift}
 \end{frame}
 
 \begin{frame}{Swift}
-%\centering\includestandalone[scale=0.79]{figures/benchmarks-swift-alone}
-%\centering\includestandalone[scale=0.82]{figures/benchmarks-swift-with-c}
-%\centering\includestandalone[scale=0.77]{figures/benchmarks-swift-batching}
 \end{frame}
 
-\begin{frame}{OCaml}
+
+
+\begin{frame}{}
+\centering\includegraphics[width=0.8\textwidth]{pics/ocaml}
 \end{frame}
+
+\begin{frame}{Ocaml}
+\end{frame}
+
+
+\begin{frame}{}
+\centering\includegraphics[width=0.8\textwidth]{pics/haskell}
+\end{frame}
+
 
 \begin{frame}{Haskell}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.8\textwidth]{pics/go}
 \end{frame}
 
 \begin{frame}{Go}
@@ -503,6 +574,10 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \item<3-> Ruleset for unsafe pointers to still be valid
 \end{itemize}
 \end{itemize}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.8\textwidth]{pics/rust}
 \end{frame}
 
 \begin{frame}{Rust}
@@ -624,7 +699,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 
 
 \begin{frame}{Conclusion: Check out our code}
-\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
+%\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
 \begin{itemize}
 \item Meta-repository with links: \url{https://github.com/ixy-languages/ixy-languages}
 \item Drivers are simple: don't be afraid of them
