@@ -768,24 +768,11 @@ for i := uint32(0); i < numEntries; i++ {
 \end{frame}
 
 \begin{frame}[fragile]{No volatile no problem}
-\begin{itemize}
-\item Easy solution for (pci) files: fd.Sync():
-\end{itemize}
-\begin{minted}[autogobble]{go}
-func readIo32(fd *os.File, offset uint) uint32 {
-	fd.Sync()
-	b := make([]byte, 4)
-	n, err := fd.ReadAt(b, int64(offset))
-	//check err
-	return binary.[Big|Little]Endian.Uint32(b)
-}
-\end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{No volatile no problem}
 %insert code registers
 \begin{itemize}
-\item Slightly more creativity needed for DMA memory:
+\item Registers share memory with NIC
+\item Memory barrier to prevent re-ordering
+\item sync/atomic functions prevent re-ordering around them
 \end{itemize}
 \begin{minted}[autogobble]{go}
 func setReg32(addr []byte, reg int, value uint32) {
@@ -808,7 +795,7 @@ func getReg32(addr []byte, reg int) uint32 {
 \item<2-> But
 \begin{itemize}
 \item<2-> approx 10\% slower then C at optimum batch size
-\item<2-> Needs higher batch sizes to be efficient
+%\item<2-> Needs higher batch sizes to be efficient
 \item<2-> Descriptor access can be ugly (functions on descriptors are too costly)
 \end{itemize}
 \end{itemize}
