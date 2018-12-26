@@ -591,9 +591,7 @@ public func touch() {
 \item Compiled language
 \item Memory management via garbage collection
 \item Memory safe
-%\pause
-%\vspace{1em}
-%\item Access to external memory via \texttt{UnsafeBufferPointer} 
+\item Functional language
 \end{itemize}
 \end{frame}
 
@@ -613,7 +611,7 @@ public func touch() {
 ]
 \end{minted}
 \begin{itemize}
-\item Cstruct generates code to work with (foreign) memory that looks like this
+\item Cstruct generates accessors to work with (foreign) memory that looks like this
 \end{itemize}
 \end{frame}
 
@@ -625,7 +623,7 @@ public func touch() {
 let num_done =
   let rec loop offset =
     let rxd = descriptors.(wrap_rx (rxq.rx_index + offset)) in
-    if Int32.((get_adv_tx_wb_status rxd) land RXD.stat_dd <> 0l) then
+    if Int32.((get_adv_rx_wb_status rxd) land RXD.stat_dd <> 0l) then
       loop (offset + 1)
     else
       offset in
@@ -655,7 +653,56 @@ let num_done =
 \setbeamertemplate{footline}[tumfootline]
 
 \begin{frame}{Haskell}
+\begin{itemize}
+\item Compiled language (GHC)
+\item Memory management via garbage collection
+\item Memory safe
+\item Functional language
+\end{itemize}
 \end{frame}
+
+
+\begin{frame}{Haskell: Access to foreign memory}
+\begin{itemize}
+\item \texttt{mmap} and \texttt{mlock} available via \texttt{System.Posix.Memory}
+\begin{itemize}
+\item All necessary flags and features are available in Haskell, we had to write some C code to get \texttt{mmap/mlock} in OCaml
+\end{itemize}
+\vspace{1em}
+\item \texttt{Foreign} package provides access to foreign memory
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Haskell: Sum types are useful}
+\begin{itemize}
+\item Descriptors often exist in two forms
+\begin{itemize}
+\item One format written by the driver and read by the device
+\item A second format that is written back by the device once it's finished
+\end{itemize}
+\end{itemize}
+\begin{minted}{haskell}
+data TransmitDescriptor = TransmitRead { tdBufPhysAddr :: !Word64
+                                       , tdCmdTypeLen :: !Word32
+                                       , tdOlInfoStatus :: !Word32 }
+                          | TransmitWriteback { tdStatus :: !Word32 }
+\end{minted}
+\end{frame}
+
+
+\begin{frame}[fragile]{Haskell: How to write a TX descriptor}
+\begin{minted}{haskell}
+unsafeUseAsCStringLen pkt (\(ptr, len) -> copyBytes bufPtr (castPtr ptr) len)
+poke descPtr TransmitRead { tdBufPhysAddr = bufPhysAddr 
+                          , tdCmdTypeLen = fromIntegral $ cmdTypeLen size
+                          , tdOlInfoStatus = fromIntegral $ shift size 14 }
+writeIORef (txqIndexRef queue) nextIndex
+\end{minted}
+\end{frame}
+
+
+
 
 \setbeamertemplate{footline}{}
 \setbeamertemplate{headline}{}
