@@ -502,7 +502,7 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \begin{minted}[autogobble]{csharp}
 public unsafe void WriteData(uint offset, int val) {
     if (offset >= BUF_SIZE) throw new IndexOutOfRangeException();
-    int *ptr = (int*)(_baseAddress + DataOffset + offset);
+    int *ptr = (volatile int*)(_baseAddress + DataOffset + offset);
     *ptr = val;
 }
 \end{minted}
@@ -625,6 +625,7 @@ public func touch() {
 \end{itemize}
 \begin{minted}[autogobble]{ocaml}
 let num_done =
+  (* counting without mutation *)
   let rec loop offset =
     let rxd = descriptors.(wrap_rx (rxq.rx_index + offset)) in
     if Int32.((get_adv_rx_wb_status rxd) land RXD.stat_dd <> 0l) then
@@ -695,15 +696,15 @@ data TransmitDescriptor = TransmitRead { tdBufPhysAddr :: !Word64
 \end{frame}
 
 
-\begin{frame}[fragile]{Haskell: How to write a TX descriptor}
-\begin{minted}{haskell}
-unsafeUseAsCStringLen pkt (\(ptr, len) -> copyBytes bufPtr (castPtr ptr) len)
-poke descPtr TransmitRead { tdBufPhysAddr = bufPhysAddr 
-                          , tdCmdTypeLen = fromIntegral $ cmdTypeLen size
-                          , tdOlInfoStatus = fromIntegral $ shift size 14 }
-writeIORef (txqIndexRef queue) nextIndex
-\end{minted}
-\end{frame}
+%\begin{frame}[fragile]{Haskell: How to write a TX descriptor}
+%\begin{minted}{haskell}
+%unsafeUseAsCStringLen pkt (\(ptr, len) -> copyBytes bufPtr (castPtr ptr) len)
+%poke descPtr TransmitRead { tdBufPhysAddr = bufPhysAddr 
+%                          , tdCmdTypeLen = fromIntegral $ cmdTypeLen size
+%                          , tdOlInfoStatus = fromIntegral $ shift size 14 }
+%writeIORef (txqIndexRef queue) nextIndex
+%\end{minted}
+%\end{frame}
 
 
 
@@ -730,7 +731,7 @@ writeIORef (txqIndexRef queue) nextIndex
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Go for Drivers}
+\begin{frame}{Go for drivers}
 \begin{itemize}
 \item Actually a lot like C in many aspects
 %maybe include some code examples?
@@ -749,7 +750,7 @@ writeIORef (txqIndexRef queue) nextIndex
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Managing Memory: Mempools}
+\begin{frame}[fragile]{Managing memory: mempools}
 \begin{itemize}
 \item syscall.Mmap() returns slice of the mmapped memory area
 \item For this presentation: slice = fancy array\\
@@ -771,7 +772,7 @@ for i := uint32(0); i < numEntries; i++ {
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{No volatile no problem}
+\begin{frame}[fragile]{No volatile, no problem}
 %insert code registers
 \begin{itemize}
 \item Registers share memory with NIC
@@ -826,7 +827,7 @@ Great! That's what we are looking for! Anything else we need to know?\\
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Safety in Rust: The Ownership System}
+\begin{frame}{Safety in Rust: The ownership system}
 \begin{itemize}
 %\item Immutability of variables by default
 \item Three rules:
@@ -844,7 +845,7 @@ Great! That's what we are looking for! Anything else we need to know?\\
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Safety in Rust: The Ownership System by Example}
+\begin{frame}[fragile]{Safety in Rust: The ownership system by example}
 \begin{itemize}
 \item \texttt{Packet}s are owners of some DMA memory
 \item \texttt{Packet}s are passed between users and the driver, thus ownership is passed as well
@@ -861,7 +862,7 @@ buffer.drain(..);
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Safety in Rust: Unsafe Code}
+\begin{frame}[fragile]{Safety in Rust: Unsafe code}
 \begin{itemize}
 \item Not everything can be done in safe Rust
 \item Calling foreign functions and dereferencing raw pointers is per se unsafe
@@ -877,7 +878,7 @@ let ptr = unsafe {
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Rust by Example}
+\begin{frame}[fragile]{Rust by example}
 \begin{itemize}
 \item Biggest challenge: safe memory handling with unsafe code
 \end{itemize}
@@ -899,7 +900,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 \end{frame}
 
-\begin{frame}{Batching at 1.6,\GHz CPU speed}
+\begin{frame}{Batching at 1.6\,GHz CPU speed}
 \centering\includestandalone[scale=0.8]{figures/benchmarks-all-batching}
 \end{frame}
 
@@ -968,6 +969,26 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \centering\includestandalone[scale=.75]{figures/iommu1}
 \end{frame}
 
+\begin{frame}{Memory access on modern systems}
+\centering\includestandalone[scale=.75]{figures/iommu2}
+\end{frame}
+
+\begin{frame}{Memory access on modern systems}
+\centering\includestandalone[scale=.75]{figures/iommu3}
+\end{frame}
+
+\begin{frame}{Memory access on modern systems}
+\centering\includestandalone[scale=.75]{figures/iommu4}
+\end{frame}
+
+\begin{frame}{Memory access on modern systems}
+\centering\includestandalone[scale=.75]{figures/iommu5}
+\end{frame}
+
+\begin{frame}{Memory access on modern systems}
+\centering\includestandalone[scale=.75]{figures/iommu6}
+\end{frame}
+
 \begin{frame}{Unprivileged user space drivers on Linux}
 \begin{itemize}
 \item[1.] Prepare the system as root
@@ -1019,7 +1040,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 %\end{frame}
 
 \begin{frame}{Conclusion: Check out our code}
-%\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
+\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
 \begin{itemize}
 \item Meta-repository with links: \url{https://github.com/ixy-languages/ixy-languages}
 \item Drivers are simple: don't be afraid of them

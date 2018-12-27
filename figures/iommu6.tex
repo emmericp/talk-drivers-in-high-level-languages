@@ -15,7 +15,7 @@
 \node at ([yshift=-.5mm] memoryctl) [color=white] {\Large \textbf{{Memory Controller}}};
 \node (mmu) at ([yshift=1.35cm] cpu.south) [anchor=south, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .66cm] {\Large\textbf{\phantom{MMUy}}};
 \node at ([yshift=-.5mm] mmu) [color=white] {\Large \textbf{{MMU\vphantom{y}}}};
-%\node (iommu) at ([yshift=.2cm] cpu.south) [anchor=south, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .66cm] {\Large\textbf{\phantom{IOMMUy}}};\node at ([yshift=-.5mm] iommu) [color=white] {\Large \textbf{{IOMMU\vphantom{y}}}};
+\node (iommu) at ([yshift=.2cm] cpu.south) [anchor=south, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .66cm] {\Large\textbf{\phantom{IOMMUy}}};\node at ([yshift=-.5mm] iommu) [color=white] {\Large \textbf{{IOMMU\vphantom{y}}}};
 \node (driver) at ([yshift=-.2cm] cpu.north) [anchor=north, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=2cm, minimum height = .66cm] {\Large\textbf{\phantom{Application}}};
 \node at ([yshift=-.5mm] driver) [color=white] {\Large \textbf{Application}};
 
@@ -38,11 +38,15 @@
 
 % mmu to nic
 \draw[thick, color=TUMRed,dotted,ultra thick] (mmu.west) -| (pci.north);
-\draw[thick, color=TUMRed,dotted,ultra thick] (pci.south) -- (dma.north);
+\draw[thick, color=TUMRed,line width=2mm] (pci.south) -- (dma.north);
 
 % mmu to memory
 \draw[thick, color=TUMRed,dotted,ultra thick] (mmu.east) -| (memoryctl.north);
-\draw[thick, color=TUMRed,dotted,ultra thick] (memoryctl.south) -- (memoryint.north);
+\draw[thick, color=TUMRed,line width=2mm] (memoryctl.south) -- (memoryint.north);
+
+% IOMMU
+\draw[thick, color=TUMRed,line width=2mm] (pci.east) -- (iommu.west);
+\draw[thick, color=TUMRed,line width=2mm] (iommu.east) -- (memoryctl.west);
 
 
 \end{tikzpicture}

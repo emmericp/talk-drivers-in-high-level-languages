@@ -38,11 +38,14 @@
 
 % mmu to nic
 \draw[thick, color=TUMRed,dotted,ultra thick] (mmu.west) -| (pci.north);
-\draw[thick, color=TUMRed,dotted,ultra thick] (pci.south) -- (dma.north);
+\draw[thick, color=TUMRed,line width=2mm] (pci.south) -- (dma.north);
 
 % mmu to memory
 \draw[thick, color=TUMRed,dotted,ultra thick] (mmu.east) -| (memoryctl.north);
-\draw[thick, color=TUMRed,dotted,ultra thick] (memoryctl.south) -- (memoryint.north);
+\draw[thick, color=TUMRed,line width=2mm] (memoryctl.south) -- (memoryint.north);
+
+
+\draw[thick, color=TUMRed,line width=2mm] (memoryctl.west) -- (pci.east);
 
 
 \end{tikzpicture}

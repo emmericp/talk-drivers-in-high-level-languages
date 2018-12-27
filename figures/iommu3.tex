@@ -34,11 +34,11 @@
 \node at ([yshift=-.5mm] memoryint) [color=white] {\Large \textbf{{DDR4\vphantom{g}}}};
 
 % driver to mmu
-\draw[thick, color=TUMRed,dotted,ultra thick] (driver.south) -- (mmu.north);
+\draw[thick, color=TUMRed,line width=2mm] (driver.south) -- (mmu.north);
 
 % mmu to nic
-\draw[thick, color=TUMRed,dotted,ultra thick] (mmu.west) -| (pci.north);
-\draw[thick, color=TUMRed,dotted,ultra thick] (pci.south) -- (dma.north);
+\draw[thick, color=TUMRed,line width=2mm] (mmu.west) -| (pci.north);
+\draw[thick, color=TUMRed,line width=2mm] (pci.south) -- (dma.north);
 
 % mmu to memory
 \draw[thick, color=TUMRed,dotted,ultra thick] (mmu.east) -| (memoryctl.north);
