@@ -910,26 +910,75 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
 \end{frame}
 
-
-\begin{frame}{Restricting devices with the IOMMU}
-\end{frame}
-
 \begin{frame}{Look ma, no root}
+\begin{itemize}
+\item User space drivers usually run with root privileges, but why?
+\pause
+\vspace{1em}
+\item Mapping PCIe resources requires root
+\item Allocating non-transparent huge pages requires root
+\item Locking memory requires root
+\vspace{1em}
+\item Can we do that in a small separate program that is easy to audit and then drop privileges?
+\pause
+\item Yes, we can
+\item But it's not really secure
+\end{itemize}
 \end{frame}
+
+\begin{frame}{Memory access on modern systems}
+image goes here
+\end{frame}
+
+\begin{frame}{Unprivileged user space drivers on Linux}
+\begin{itemize}
+\item[1.] Prepare the system as root
+\begin{itemize}
+\item[1.1.] Bind the device to the special \texttt{vfio} driver
+\item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
+\item[1.3.] Allow your user to lock some amount of memory via \texttt{via ulimit}
+\end{itemize}
+\pause
+\item[2.] \texttt{mmap} the special magic \texttt{vfio} device
+\item[3.] Do some magic \texttt{ioctl} calls on the magic device
+\item[4.] Protected DMA memory can also be allocated via an \texttt{ioctl} call
+\item[5.] Use the device as usual, all accesses are now checked by the IOMMU
+\vspace{1em}
+\pause
+\item We have implemented this in our C driver, Rust is WIP
+\end{itemize}
+\end{frame}
+
+
 
 
 \begin{frame}{Why write a user space network driver?}
+\begin{itemize}
+\item Why not? It can be fun
+\item Maybe you need a quick \& dirty driver for a weird device?
+\item Maybe you need quick development cycles while playing around with a custom device
+\item Maybe you need some feature not supported by the original driver
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Hardware timestamping}
+\begin{itemize}
+\item Our latency measurement requires timestamps with nanosecond-level precision
+\item It also needs to handle millions of packets per second (we measured with $\approx$ 15\,Mpps)
+\item This usually requires special hardware (we've used NetFPGAs to do this in the past)
+\pause
+\vspace{1em}
+\item Some cheap off-the-shelf NICs can add a timestamp to all  incoming packets
+\item But none of the existing drivers support this feature :(
+\pause
+\item We just set some flags in the right registers and got precise timestamping for cheap
+\item We used a Xeon D embedded NIC capturing all packets via a fiber optic splitter before and after our device under test (precision $\approx$ \textpm 15\,ns)
+\end{itemize}
 \end{frame}
 
 %\begin{frame}{(Maybe) network stack of the future}
 %\end{frame}
-
-\begin{frame}{Why? Features!}
-\end{frame}
-
-\begin{frame}{Example: hardware timestamping}
-\end{frame}
-
 
 \begin{frame}{Conclusion: Check out our code}
 %\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
