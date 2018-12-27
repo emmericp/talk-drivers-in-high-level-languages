@@ -1,0 +1,44 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty} 
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+
+\begin{document}
+\begin{tikzpicture}
+
+\node (cpu) [color=white, fill=TUMLightBlue, rounded corners=.15cm, minimum width=12cm, minimum height = 4cm] {};
+\node at ([yshift=0cm] cpu.north west) [color=white, anchor=north west] {\textbf{CPU}};
+\node (pci) at ([xshift=.2cm,yshift=.2cm] cpu.south west) [anchor=south west, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=4cm, minimum height = .6cm] {\textbf{PCIe Root}};
+\node (memoryctl) at ([xshift=-.2cm,yshift=.2cm] cpu.south east) [anchor=south east, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=4cm, minimum height = .6cm] {\textbf{Memory controller}};
+\node (mmu) at ([yshift=.4cm] memoryctl.north) [anchor=south, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .6cm] {\textbf{MMU}};
+\node (iommu) at ([yshift=.2cm] cpu.south) [anchor=south, color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .6cm] {\textbf{IOMMU}};
+\node (driver) at ([yshift=-.2cm] cpu.north) [anchor=north, color=white, fill=TUMBlue, rounded corners=.1ex, minimum width=2cm, minimum height = .6cm] {\textbf{Application}};
+
+\draw[thick, color=white,dashed] (cpu.west) -- (cpu.east);
+
+\node (nicpos) at ([yshift=-2cm]pci.south) {};
+\node (nic) at ([xshift=1.7cm, yshift=.5cm] nicpos) [anchor= north east, color=white, fill=TUMLightBlue, rounded corners=.15cm, minimum width=6cm, minimum height = 2.5cm] {};
+\node at ([yshift=0cm] nic.north west) [color=white, anchor=north west] {\textbf{PCIe Device}};
+\node (dma) at (nicpos) [color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=3cm, minimum height = .5cm] {\textbf{DMA Engine}};
+
+\node (memorypos) at ([yshift=-2cm]memoryctl.south) {};
+\node (memory) at ([xshift=-1.2cm, yshift=.5cm] memorypos) [anchor= north west, color=white, fill=TUMLightBlue, rounded corners=.15cm, minimum width=6cm, minimum height = 2.5cm] {};
+\node at ([yshift=0cm] memory.north east) [color=white, anchor=north east] {\textbf{Memory}};
+\node (memoryint) at (memorypos) [color=white, fill=TUMGreen, rounded corners=.1ex, minimum width=2cm, minimum height = .5cm] {\textbf{DDR4}};
+
+% driver to mmu
+\draw[thick, color=TUMRed,dotted,ultra thick] (driver.east) -| (mmu.north);
+
+% mmu to nic
+\draw[thick, color=TUMRed,dotted,ultra thick] (mmu.west) -| (pci.north);
+\draw[thick, color=TUMRed,dotted,ultra thick] (pci.south) -- (dma.north);
+
+% mmu to memory
+\draw[thick, color=TUMRed,dotted,ultra thick] (mmu.south) -- (memoryctl.north);
+\draw[thick, color=TUMRed,dotted,ultra thick] (memoryctl.south) -- (memoryint.north);
+
+
+\end{tikzpicture}
+
+\end{document}
