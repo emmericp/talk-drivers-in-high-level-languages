@@ -187,20 +187,6 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
-\begin{itemize}
-\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
-\item Commonly found in servers or as on-board chips
-\item Very good datasheet publicly available
-\vspace{1em}
-\item Almost no logic hidden behind black-box firmware
-%\item<2-> Black-box firmware contains almost no magic
-\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
-\item<2-> Here: all hardware features directly exposed to the driver
-\end{itemize}
-\end{frame}
-
-
 \begin{frame}{Expectation: Beautiful C code}
 \begin{itemize}
 \item Why write a driver in C?
@@ -378,6 +364,21 @@
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
+\begin{itemize}
+\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
+\item Commonly found in servers or as on-board chips
+\item Very good datasheet publicly available
+\vspace{1em}
+\item Almost no logic hidden behind black-box firmware
+%\item<2-> Black-box firmware contains almost no magic
+\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
+\item<2-> Here: all hardware features directly exposed to the driver
+\end{itemize}
+\end{frame}
+
+
+
 \newmintinline[ccode]{c}{}
 \newmintinline[bashcode]{c}{}
 
@@ -448,7 +449,7 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \begin{frame}{Challenges for high-level languages}
 \begin{itemize}
 \item Access to \texttt{mmap} with the proper flags
-\item Handle externally allocated memory in the language
+\item Handle externally allocated (foreign) memory in the language
 \item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
 \item Memory access semantics: memory barriers, volatile reads/writes
 \item Some operations in drivers are inherently unsafe
@@ -544,7 +545,7 @@ public unsafe void WriteData(uint offset, int val) {
 
 \begin{frame}[fragile]{Swift: Pointers}
 \begin{itemize}
-\item \texttt{UnsafeBufferPointer} wraps a foreign memory blob
+\item \texttt{UnsafeBufferPointer} and co wrap foreign memory blobs
 \item Used to make packets in DMA buffers available
 \end{itemize}
 \begin{minted}[autogobble]{swift}
@@ -558,7 +559,7 @@ public var packetData: UnsafeBufferPointer<UInt8>? {
 }
 \end{minted}
 \begin{itemize}
-\item Forces you to specify the memory size, accesses then check the bounds
+\item Forces you to specify the buffer size, accesses check the bounds in debug mode
 \end{itemize}
 \end{frame}
 
@@ -743,7 +744,7 @@ writeIORef (txqIndexRef queue) nextIndex
 \item<3-> Manage DMA memory via slices
 \item<3-> Unsafe pointers: circumvent runtime but allow arbitrary pointer\\
 	$\rightarrow$ Physical address calculation \& register access
-\item<3-> Ruleset for unsafe pointers to still be valid
+\item<3-> Rule set for unsafe pointers to still be valid
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -792,12 +793,12 @@ func getReg32(addr []byte, reg int) uint32 {
 \begin{itemize}
 \item Actually quite nice to work with
 \begin{itemize}
-\item Safety (see Cutler et al.)
+\item Safety (see Cutler et al.\footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018})
 \item Looks like C in beautiful
 \end{itemize}
 \item<2-> But
 \begin{itemize}
-\item<2-> approx 10\% slower then C at optimum batch size
+\item<2-> Approx 10\% slower then C % at optimum batch size
 %\item<2-> Needs higher batch sizes to be efficient
 \item<2-> Descriptor access can be ugly (functions on descriptors are too costly)
 \end{itemize}
@@ -829,11 +830,11 @@ Great! That's what we are looking for! Anything else we need to know?\\
 \begin{itemize}
 %\item Immutability of variables by default
 \item Three rules:
-\begin{itemize}
-\item Each value has a variable that is its owner.
-\item There can only be one owner at a time.
-\item When the owner goes out of scope, the value is freed.
-\end{itemize}
+\begin{enumerate}
+\item Each value has a variable that is its owner
+\item There can only be one owner at a time
+\item When the owner goes out of scope, the value is freed
+\end{enumerate}
 \item Rules enforced at compile-time
 \item Ownership can be passed to another variable% by
 %\begin{itemize}
@@ -894,36 +895,17 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Rust by Example}
-% TODO: some packet code or graphic? forwarder?
-\begin{itemize}
-\item look at this nice code ...
-\end{itemize}
-\begin{minted}{c}
-fn set_reg32(&self, reg: u32, val: u32) {
-  assert!(
-    reg as usize <= self.len - 4 as usize,
-    "memory access out of bounds"
-  );
-
-  unsafe {
-    ptr::write_volatile((self.addr as usize + reg as usize) as *mut u32, val);
-  }
-}
-\end{minted}
-\end{frame}
-
 \begin{frame}{Performance comparison}
 \centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 \end{frame}
 
-\begin{frame}{Batching}
+\begin{frame}{Batching at 1.6,\GHz CPU speed}
 \centering\includestandalone[scale=0.8]{figures/benchmarks-all-batching}
 \end{frame}
 
 \setbeamertemplate{footline}{}
 \setbeamertemplate{headline}{}
-\begin{frame}{}
+\begin{frame}{Swift: Flame graph}
 \hspace{-.5cm}\includegraphics[width=1.065\textwidth]{pics/flamegraph}
 \end{frame}
 \setbeamertemplate{footline}[tumfootline]
@@ -932,37 +914,37 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \begin{frame}{Swift: Why so slow?}
 \begin{itemize}
 \item Lots of time spent in Swift's memory management
-\item Swift adds calls for each used object in each function
+\item Swift adds calls to release/retain for each used object in each function
 \item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
 \vspace{1em}
 \pause
 \item Time in release/retain: 76\%
-\item For comparison: Go spends only 0.5\% in the garbage collector
+\item For comparison: Go spends less than 0.5\% in the garbage collector
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
-%\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
+\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
-%\centering\includestandalone[scale=0.8]{figures/latency-cdf2}
+\centering\includestandalone[scale=0.8]{figures/latency-cdf2}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
-%\centering\includestandalone[scale=0.8]{figures/latency-cdf3}
+\centering\includestandalone[scale=0.8]{figures/latency-cdf3}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
-%\centering\includestandalone[scale=0.8]{figures/latency-cdf4}
+\centering\includestandalone[scale=0.8]{figures/latency-cdf4}
 \end{frame}
 
 \begin{frame}{Complementary cumulative distribution function}
-%\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
+\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
 \end{frame}
 
 \begin{frame}{Tail latency}
-%\centering\includestandalone[scale=0.8]{figures/latency-hdr-hist}
+\centering\includestandalone[scale=0.8]{figures/latency-hdr-hist}
 \end{frame}
 
 
@@ -992,7 +974,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \begin{itemize}
 \item[1.1.] Bind the device to the special \texttt{vfio} driver
 \item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
-\item[1.3.] Allow your user to lock some amount of memory via \texttt{via ulimit}
+\item[1.3.] Allow your user to lock some amount of memory via \texttt{ulimit}
 \end{itemize}
 \pause
 \item[2.] \texttt{mmap} the special magic \texttt{vfio} device
