@@ -1,5 +1,4 @@
 \documentclass[NET,english,aspectratio=169,notitleframe]{tumbeamer}
-
 %settings
 \usepackage[utf8]{inputenc}
 \usepackage{pgfplotstable}
@@ -844,24 +843,44 @@ Great! That's what we are looking for! Anything else we need to know?\\
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Safety in Rust: The Ownership System by Example}
+\begin{itemize}
+\item \texttt{Packet}s are owners of some DMA memory
+\item \texttt{Packet}s are passed between users and the driver, thus ownership is passed as well
+\item At any point in time there is only one \texttt{Packet} owner that can change its memory
+\end{itemize}
+\begin{minted}{rust}
+let buffer: &mut VecDeque<Packet> = VecDeque::new();
+dev.rx_batch(RX_QUEUE, buffer, BATCH_SIZE);
+for p in buffer.iter_mut() {
+  p[48] += 1;
+}
+dev.tx_batch(TX_QUEUE, buffer);
+buffer.drain(..);
+\end{minted}
+\end{frame}
+
 \begin{frame}[fragile]{Safety in Rust: Unsafe Code}
 \begin{itemize}
 \item Not everything can be done in safe Rust
-\item Calling foreign functions and dereferencing raw pointers is always unsafe
+\item Calling foreign functions and dereferencing raw pointers is per se unsafe
 \item Many functions in Rust's standard library make use of unsafe code
 \end{itemize}
-\begin{minted}{c}
-unsafe {
-  println!("Your uid is {}.", libc::getuid());
-}
+\begin{minted}{rust}
+let ptr = unsafe {
+  libc::mmap(
+    ptr::null_mut(), len, libc::PROT_READ | libc::PROT_WRITE,
+    libc::MAP_SHARED, file.as_raw_fd(), 0,
+  ) as *mut u8
+};
 \end{minted}
 \end{frame}
 
 \begin{frame}[fragile]{Rust by Example}
 \begin{itemize}
-\item biggest challenge: memory handling inside and outside the driver
+\item Biggest challenge: safe memory handling with unsafe code
 \end{itemize}
-\begin{minted}{c}
+\begin{minted}{rust}
 fn set_reg32(&self, reg: u32, val: u32) {
   assert!(
     reg as usize <= self.len - 4 as usize,
