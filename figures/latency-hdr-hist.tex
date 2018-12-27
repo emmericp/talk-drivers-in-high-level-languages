@@ -1,5 +1,5 @@
 \documentclass[class=minimal,border=0pt]{standalone}
-\usepackage{tumcolors}
+\usepackage{tumcolor}
 
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
@@ -14,8 +14,8 @@
 \tikzset{every mark/.append style={scale=0.9}}
 \begin{tikzpicture}
 \begin{axis}[
-	width=9cm,
-	height=6cm,
+	width=12cm,
+	height=8cm,
 %	xmode=log,
 	x dir=reverse,
 	xmode=log,
@@ -29,15 +29,17 @@
 	ylabel={Latency [$\mu$s]},
 %	ytick ={516, 520, 524},
 %	xtick={0, 20.16, 40.032, 60.48, 80.64, 100.86},
-	legend style={font=\fontsize{8}{9}\selectfont},
-	tick label style={font=\fontsize{8}{9}\selectfont},
-	label style={font=\fontsize{8}{9}\selectfont},
+%	legend style={font=\fontsize{8}{9}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
 	every axis legend/.append style={nodes={right}},
-	legend entries={Rust, C\#},
+	legend entries={Rust, Go, C\#},
+	reverse legend,
 	legend pos = north west
 ]
-\addplot [mark=none,color=TUMDarkerBlue,thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {latency-rust.csv};
-\addplot [mark=none,color=TUMOrange,thick] table[col sep=comma,y=lat, x expr=1-\thisrow{cdf}] {latency-cs.csv};
+\addplot [mark=none,color=TUMDarkerBlue,ultra thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {latency-rust.csv};
+\addplot [mark=none,color=TUMDarkYellow,ultra thick] table[col sep=comma,y=lat, x expr=1-\thisrow{cdf}] {latency-go.csv};
+\addplot [mark=none,color=TUMOrange,ultra thick] table[col sep=comma,y=lat, x expr=1-\thisrow{cdf}] {latency-cs.csv};
 \end{axis}
 \end{tikzpicture}
 \end{document}

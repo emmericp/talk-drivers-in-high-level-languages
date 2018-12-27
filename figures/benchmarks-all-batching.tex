@@ -7,20 +7,15 @@
 
 \begin{document}
 \begin{tikzpicture}
-	\definecolor{c}{RGB}{85,85,85}
-	\definecolor{csharp}{RGB}{23,134,0}
-	\definecolor{go}{RGB}{55,94,171}
-	\definecolor{rust}{RGB}{222,165,132}
-	\definecolor{swift}{RGB}{255,172,69}
 
 	\begin{axis}[
-		height=6cm,
-		width=14cm,
+		height=8cm,
+		width=12cm,
 		grid=major,
 		xlabel={Batch Size},
 		ylabel={Packet Rate in Mpps},
 		ymin=0,
-		ymax=35,
+		ymax=20,
 		xmin=1,
 		xmax=256,
 		xmode=log,
@@ -32,9 +27,9 @@
 		%legend style={at={(0.02,0.80)},anchor=north west}
 	]
 
-		\draw [line width=0.02cm,dashed] (1,29.76) -- (256,29.76) node [midway,above]{Line Rate};
+%		\draw [line width=0.02cm,dashed] (1,29.76) -- (256,29.76) node [midway,above]{Line Rate};
 
-		\addplot[c,mark=*] coordinates {
+		\addplot[color=TUMBlack,mark=x] coordinates {
 			(1,4.1)
 			(2,7.6)
 			(4,11.3)
@@ -46,34 +41,9 @@
 			(256,17.5)
 		};
 		\addlegendentry{C}
-
-		\addplot[csharp,mark=triangle*] coordinates {
-			(1,1.4)
-			(2,2.6)
-			(4,5.0)
-			(8,7.6)
-			(16,10.4)
-			(32,12.4)
-			(64,14.3)
-			(128,15.0)
-			(256,15.6)
-		};
-		\addlegendentry{C\#}
-
-		\addplot[go,mark=diamond*] coordinates {
-			(1,1.7)
-			(2,3.1)
-			(4,5.4)
-			(8,8.1)
-			(16,10.3)
-			(32,12.2)
-			(64,13.2)
-			(128,13.3)
-			(256,13.4)
-		};
-		\addlegendentry{Go}
-
-		\addplot[rust,mark=square*] coordinates {
+		
+		
+		\addplot[mark=square*,color=TUMDarkerBlue] coordinates {
 			(1,3.4)
 			(2,6.0)
 			(4,9.5)
@@ -86,7 +56,34 @@
 		};
 		\addlegendentry{Rust}
 
-		\addplot[swift,mark=*] coordinates {
+		\addplot[mark=diamond*,color=TUMOrange] coordinates {
+			(1,1.4)
+			(2,2.6)
+			(4,5.0)
+			(8,7.6)
+			(16,10.4)
+			(32,12.4)
+			(64,14.3)
+			(128,15.0)
+			(256,15.6)
+		};
+		\addlegendentry{C\#}
+
+		\addplot[mark=triangle*,color=TUMDarkYellow] coordinates {
+			(1,1.7)
+			(2,3.1)
+			(4,5.4)
+			(8,8.1)
+			(16,10.3)
+			(32,12.2)
+			(64,13.2)
+			(128,13.3)
+			(256,13.4)
+		};
+		\addlegendentry{Go}
+
+
+		\addplot[color=TUMLightRed,mark=*] coordinates {
 			(1,0.91)
 			(2,1.39)
 			(4,1.93)

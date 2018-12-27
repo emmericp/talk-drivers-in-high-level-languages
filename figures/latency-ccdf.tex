@@ -1,5 +1,5 @@
 \documentclass[class=minimal,border=0pt]{standalone}
-\usepackage{tumcolors}
+\usepackage{tumcolor}
 
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
@@ -14,24 +14,24 @@
 \tikzset{every mark/.append style={scale=0.9}}
 \begin{tikzpicture}
 \begin{axis}[
-	width=9.6cm,
-	height=6.75cm,
+	width=12cm,
+	height=8cm,
 	xmin=0, xmax=200,
 	ymin=0.000001, ymax=1,
 	ymode=log,
 	grid=major,
 	ylabel={CCDF},
 	xlabel={Latency [$\mu$s]},
-	legend style={font=\fontsize{8}{9}\selectfont},
-	tick label style={font=\fontsize{8}{9}\selectfont},
-	label style={font=\fontsize{8}{9}\selectfont},
+%	legend style={font=\fontsize{8}{9}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
 	every axis legend/.append style={nodes={right}},
 	legend entries={Rust, Go, C\#},
 	legend pos = north east
 ]
-\addplot [mark=none,color=TUMDarkerBlue, thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {latency-rust.csv};
-\addplot [mark=none,color=TUMOrange, thick] table[col sep=comma,x=lat, y expr=1-\thisrow{cdf}] {latency-go.csv};
-\addplot [mark=none,color=TUMGreen, thick] table[col sep=comma,x=lat, y expr=1-\thisrow{cdf}] {latency-cs.csv};
+\addplot [mark=none,color=TUMDarkerBlue, ultra thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {latency-rust.csv};
+\addplot [mark=none,color=TUMDarkYellow, ultra thick] table[col sep=comma,x=lat, y expr=1-\thisrow{cdf}] {latency-go.csv};
+\addplot [mark=none,color=TUMOrange, ultra thick] table[col sep=comma,x=lat, y expr=1-\thisrow{cdf}] {latency-cs.csv};
 \addplot[mark=none,color=black!60,forget plot,dashed,thick] coordinates {
 (0,0.01)
 (200,0.01)
@@ -40,8 +40,8 @@
 (0,0.0001)
 (200,0.0001)
 };
-\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.01) {\fontsize{8}{9}\selectfont 99th percentile};
-\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.0001) {\fontsize{8}{9}\selectfont 99.99th percentile};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.01) { 99th percentile};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.0001) { 99.99th percentile};
 \end{axis}
 \end{tikzpicture}
 \end{document}

@@ -1,0 +1,61 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{tumcolor}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=0.9}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=12cm,
+	height=8cm,
+	xmin=0, xmax=40,
+	ymin=0, ymax=1,
+	grid=major,
+	ylabel={CDF},
+	xtick={0, 4, ..., 40},
+	xlabel={Latency [$\mu$s]},
+	max space between ticks=20,
+%	ytick ={516, 520, 524},
+%	xtick={0, 20.16, 40.032, 60.48, 80.64, 100.86},
+%	legend style={font=\fontsize{8}{9}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={Rust, Go, C\#},
+	legend pos = south east
+]
+\addplot [mark=none,color=TUMDarkerBlue, ultra thick] table[col sep=comma,x=lat,y=cdf] {latency-rust.csv};
+\addplot [mark=none,color=TUMDarkYellow,ultra thick] table[col sep=comma,x=lat, y=cdf] {latency-go.csv};
+\addplot [mark=none,color=TUMOrange, ultra thick] table[col sep=comma,x=lat, y=cdf] {latency-cs.csv};
+\addplot[mark=none,color=black!80,forget plot,thick] coordinates {
+(0,0.5)
+(8.88,0.5)
+};
+\addplot[mark=none,color=black!80,forget plot,thick] coordinates {
+(8.88,0.5)
+(8.88,00)
+};
+%\addplot[mark=none,color=black!80,forget plot,thick] coordinates {
+%(0,0.99)
+%(30,0.99)
+%};
+%\addplot[mark=none,color=black!80,forget plot,thick] coordinates {
+%(30,0.99)
+%(30,00)
+%};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 3,0.5) { 50\%};
+%\node[anchor = north,yshift=0.2em] at (axis cs: 3,0.99) { 99\%};
+
+\node[anchor = west,xshift=-0.2em] at (axis cs: 8.88,0.25) {8.9\,$\mu$s};
+%\node[anchor = west,xshift=-0.2em] at (axis cs: 30,0.495) {30\,$\mu$s};
+\end{axis}
+\end{tikzpicture}
+\end{document}

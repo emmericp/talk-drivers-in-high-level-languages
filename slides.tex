@@ -78,6 +78,7 @@
 \makeatletter
 \let\@@magyar@captionfix\relax
 \makeatother
+
 \begin{document}
 
 \setbeamertemplate{footline}{}
@@ -894,24 +895,57 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{frame}
 
 \begin{frame}{Performance comparison}
-\centering\includestandalone[scale=0.82]{figures/benchmarks-all-throughput}
+\centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 \end{frame}
 
 \begin{frame}{Batching}
-\centering\includestandalone[scale=0.85]{figures/benchmarks-all-batching}
+\centering\includestandalone[scale=0.8]{figures/benchmarks-all-batching}
 \end{frame}
 
-\begin{frame}{Performance comparison}
-% TODO: observations and reasons/speculations for good/bad performance?
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+\begin{frame}{}
+\hspace{-.5cm}\includegraphics[width=1.065\textwidth]{pics/flamegraph}
+\end{frame}
+\setbeamertemplate{footline}[tumfootline]
+\setbeamertemplate{headline}[tumheadline]
+
+\begin{frame}{Swift: Why so slow?}
 \begin{itemize}
-\item Rust's throughput close to C, safe wrappers lead to more memory operations
-\item Swift performs incredibly poor
-\item ...
+\item Lots of time spent in Swift's memory management
+\item Swift adds calls for each used object in each function
+\item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
+\vspace{1em}
+\pause
+\item Time in release/retain: 76\%
+\item For comparison: Go spends only 0.5\% in the garbage collector
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
 \end{frame}
+
+\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf2}
+\end{frame}
+
+\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf3}
+\end{frame}
+
+\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf4}
+\end{frame}
+
+\begin{frame}{Complementary cumulative distribution function}
+%\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
+\end{frame}
+
+\begin{frame}{Tail latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-hdr-hist}
+\end{frame}
+
 
 \begin{frame}{Look ma, no root}
 \begin{itemize}
