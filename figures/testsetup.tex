@@ -1,0 +1,39 @@
+\documentclass[class=article,border=0pt]{standalone}
+\pagestyle{empty} 
+
+\usepackage{tikz}
+\usepackage{tumcolor}
+\usetikzlibrary{arrows.meta}
+
+\begin{document}
+\begin{tikzpicture}
+
+\node (pktgen) [draw=TUMBlue,line width=2mm, fill=white, rounded corners=.15cm, minimum width=14cm, minimum height = 4.2cm] {};
+\node at ([yshift=-0.3cm,xshift=.3cm] pktgen.north west) [color=TUMBlack, anchor=north west] {\Large \textbf{Device under test}};
+
+\node (dut) at ([yshift=-2cm] pktgen.south) [anchor=north, draw=TUMBlue,line width=2mm, fill=white, rounded corners=.15cm, minimum width=14cm, minimum height = 4.2cm] {};
+\node at ([yshift=0.3cm,xshift=.3cm] dut.south west) [color=TUMBlack, anchor=south west] {\Large \textbf{MoonGen packet generator}};
+\node at ([yshift=1.2cm,xshift=.2cm] dut.south) [color=TUMBlack, anchor=south] {\includegraphics[height=2.5cm]{moongenlogo.pdf}};
+
+\node (nic1) at ([xshift=-1.5cm,yshift=-.1cm] dut.north) [draw=TUMDarkYellow,line width=1mm, fill=white, rounded corners=.15cm, minimum width=.75cm, minimum height = .75cm] {};
+\node (nic2) at ([xshift=1.5cm,yshift=-.1cm] dut.north) [draw=TUMDarkYellow,line width=1mm, fill=white, rounded corners=.15cm, minimum width=.75cm, minimum height = .75cm] {};
+
+\node (nic3) at ([xshift=-1.5cm,yshift=.1cm] pktgen.south) [draw=TUMDarkYellow,line width=1mm, fill=white, rounded corners=.15cm, minimum width=.75cm, minimum height = .75cm] {};
+\node (nic4) at ([xshift=1.5cm,yshift=.1cm] pktgen.south) [draw=TUMDarkYellow,line width=1mm, fill=white, rounded corners=.15cm, minimum width=.75cm, minimum height = .75cm] {};
+
+\node (ixy) at ([xshift=0cm,yshift=0cm] pktgen) [color=white,fill=TUMLighterBlue,line width=1mm, rounded corners=.15cm, minimum width=5cm, minimum height = .75cm] {\Large \textbf{ixy}};
+
+
+\draw[color=TUMRed,line width=1.2mm,-{Latex[length=4mm]}] ([xshift=-.2cm] nic1.north) to ([xshift=-.2cm]nic3.north) to[bend angle=38, bend left] (ixy.south) to[bend angle=38, bend left] ([xshift=.2cm] nic4.north) to[->] ([xshift=.2cm]nic2.south);
+
+\draw[color=TUMLightRed,line width=1.2mm,-{Latex[length=4mm]}] ([xshift=-.2cm] nic2.north) to ([xshift=-.2cm]nic4.north) to[bend right] ([yshift=-.4cm] ixy.south) to[bend right] ([xshift=.2cm] nic3.north) to[->] ([xshift=.2cm]nic1.south);
+
+
+
+
+\node at ([xshift=-1.8cm,yshift=-1cm] pktgen.south) [anchor=east] {10\,Gbit/s};
+\node at ([xshift=1.8cm,yshift=-1cm] pktgen.south) [anchor=west] {10\,Gbit/s};
+
+\end{tikzpicture}
+
+\end{document}

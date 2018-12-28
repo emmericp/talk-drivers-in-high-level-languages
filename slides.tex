@@ -156,7 +156,7 @@
 \begin{itemize}
 \item Go driver as bachelor's thesis
 \end{itemize}
-\emph{Everyone else}
+\emph{Everyone else mentioned on the title slide}
 \begin{itemize}
 \item Did a thesis with Paul as advisor
 \end{itemize}
@@ -404,7 +404,7 @@ echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe configuration address space from user space}
+\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe register address space from user space}
 \begin{minted}[autogobble]{c}
 int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
 struct stat stat;
@@ -436,7 +436,7 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \begin{frame}{Handling packets via DMA}
 \begin{itemize}
 \item Packets are transferred via queue interfaces (often called rings)
-\item Rings are configured via MMIO and accessed via by the device DMA
+\item Rings are configured via MMIO and accessed by the device via DMA
 \item Rings (usually) contain pointers to packets, also accessed via DMA
 \pause
 \vspace{1em}
@@ -502,7 +502,7 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \begin{minted}[autogobble]{csharp}
 public unsafe void WriteData(uint offset, int val) {
     if (offset >= BUF_SIZE) throw new IndexOutOfRangeException();
-    int *ptr = (volatile int*)(_baseAddress + DataOffset + offset);
+    volatile int *ptr = (volatile int*)(_baseAddress + DataOffset + offset);
     *ptr = val;
 }
 \end{minted}
@@ -776,7 +776,7 @@ for i := uint32(0); i < numEntries; i++ {
 %insert code registers
 \begin{itemize}
 \item Registers share memory with NIC
-\item Memory barrier to prevent re-ordering
+\item Compiler memory barrier to prevent re-ordering
 \item sync/atomic functions prevent re-ordering around them
 \end{itemize}
 \begin{minted}[autogobble]{go}
@@ -896,7 +896,18 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{minted}
 \end{frame}
 
-\begin{frame}{Performance comparison}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+
+\begin{frame}{}
+\vspace{-.75cm}
+\centering\includestandalone[scale=0.73]{figures/testsetup}
+\end{frame}
+\setbeamertemplate{footline}[tumfootline]
+\setbeamertemplate{headline}[tumheadline]
+
+
+\begin{frame}{Performance comparison (single CPU core)}
 \centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 \end{frame}
 
