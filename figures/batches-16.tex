@@ -1,0 +1,152 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{../tumcolor}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+
+\pgfplotsset{
+    mark repeat*/.style={
+        scatter,
+        scatter src=x,
+        scatter/@pre marker code/.code={
+            \pgfmathtruncatemacro\usemark{
+                (\coordindex==(\numcoords-#1)
+            }
+            \ifnum\usemark=0
+                \pgfplotsset{mark=none}
+            \fi
+        },
+        scatter/@post marker code/.code={}
+    }
+}
+
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=1}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=10cm,
+	height=6cm,
+	xmode=log,
+       log basis x={2},
+       log ticks with fixed point,
+	xmin=0.75, xmax=384,
+	ymin=0, ymax=30,
+	grid=major,
+	xtick={1, 2, 4, 8, 16, 32, 64, 128, 256},
+	ytick={0,10, 20, 30},
+	ylabel=Packet rate {[}Mpps{]},
+	xlabel={Batch size},
+	legend style={font=\fontsize{7}{8}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={C, Rust, Go, C\#, OCaml, Swift, Haskell, Python},
+	legend pos = north west, legend columns=2
+]
+
+
+\addplot [mark=none,color=TUMBlack, thick] coordinates { % C
+			(1,4.1)
+			(2,7.6)
+			(4,11.3)
+			(8,14.8)
+			(16,15.6)
+			(32,16.3)
+			(64,17.2)
+			(128,17.3)
+			(256,17.5)
+};
+\addplot [mark=x,color=TUMDarkerBlue, thick]  coordinates { % Rust
+(1,3.6)
+(2,6.5)
+(4,10.0)
+(8,13.2)
+(16,14.7)
+(32,16.0)
+(64,16.7)
+(128,17.2)
+(256,17.2)
+};
+\addplot [mark=triangle*,color=TUMGreen, thick]  coordinates { % Go
+			(1,1.7)
+			(2,3.1)
+			(4,5.4)
+			(8,8.1)
+			(16,10.3)
+			(32,12.2)
+			(64,13.2)
+			(128,13.3)
+			(256,13.4)
+};
+\addplot [mark=+,color=TUMOrange, thick]  coordinates { % C#
+			(1,1.4)
+			(2,2.6)
+			(4,5.0)
+			(8,7.6)
+			(16,10.4)
+			(32,12.4)
+			(64,14.3)
+			(128,15.0)
+			(256,15.6)
+};
+\addplot [mark=diamond*,color=TUMYellow, thick]  coordinates { % OCaml
+(1,       0.04 * 2)
+(2 ,      0.07* 2)
+(4  ,     0.15* 2)
+(8   ,    0.28* 2)
+(16  ,    0.50* 2)
+(32   ,   0.86* 2)
+(64    ,  1.32* 2)
+(128   ,  1.80* 2)
+(256    , 2.41* 2)
+(512   ,  2.00)
+};
+\addplot [mark=pentagon*,color=TUMPurple, thick]  coordinates { % Swift
+			(1,0.91)
+			(2,1.39)
+			(4,1.93)
+			(8,2.24)
+			(16,2.49)
+			(32,2.67)
+			(64,2.74)
+			(128,2.78)
+			(256,2.79)
+};
+\addplot [mark=*,color=TUMRed, thick]  coordinates { % Haskell
+(1, 0.987263* 2)
+(2, 1.40531* 2)
+(4, 1.83364* 2)
+(8, 2.15936* 2)
+(16, 2.3468* 2)
+(32, 2.44134* 2)
+(64, 2.52666* 2)
+(128, 2.52471* 2)
+(256, 2.48338* 2)
+};
+\addplot [mark=square*,color=TUMIvony!50!black!70, thick]  coordinates { % Python
+(1, 0.02* 2)
+(2, 0.02* 2)
+(4, 0.02* 2)
+(8, 0.02* 2)
+(16, 0.03* 2)
+(32, 0.04* 2)
+(64, 0.04 *2)
+(128, 0.04 *2)
+(256, 0.05 *2)
+};
+
+%\addplot[mark=none,color=black!60,forget plot,dashed,thick] coordinates {
+%(0.75,29.76)
+%(384,29.76)
+%};
+%\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.01) { 99th percentile};
+\end{axis}
+\end{tikzpicture}
+\end{document}

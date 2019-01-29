@@ -1,0 +1,81 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{../tumcolor}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+
+\pgfplotsset{
+    mark repeat*/.style={
+        scatter,
+        scatter src=x,
+        scatter/@pre marker code/.code={
+            \pgfmathtruncatemacro\usemark{
+                (\coordindex==(\numcoords-#1)
+            }
+            \ifnum\usemark=0
+                \pgfplotsset{mark=none}
+            \fi
+        },
+        scatter/@post marker code/.code={}
+    }
+}
+
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=1.2}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=10cm,
+	height=6cm,
+	xmin=0, xmax=200,
+	ymin=0.0000007, ymax=1,
+	ymode=log,
+	grid=major,
+	ylabel={CCDF},
+	xlabel={Latency [$\mu$s]},
+		ytick={1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001},
+	yticklabels={$10^0$,~,$10^{-2}$,~,$10^{-4}$,~,$10^{-6}$},
+	minor ytick={.9, .8, .7, .6, .5, .4, .3, .2, .09, .08, .07, .06, .05, .04, .03, .02, .009, .008, .007, .006, .005, .004, .003, .002, .0009, .0008, .0007, .0006, .0005, .0004, .0003, .0002, .00009, .00008, .00007, .00006, .00005, .00004, .00003, .00002, .000009, .000008, .000007, .000006, .000005, .000004, .000003, .000002},
+%	legend style={font=\fontsize{8}{9}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+%	legend entries={C, Rust, C\#, Go, OCaml, Swift},
+	legend entries={C, Rust, Go, C\#, OCaml, Swift, Haskell, Python},
+%	legend entries={C, Rust, C\#, Go, OCaml, Swift, Python},
+	legend pos = north east
+]
+% ,each nth point=100, filter discard warning=fals
+\addplot [mark=none,color=TUMBlack, thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {c-cdf.csv};
+\addplot [mark=x,color=TUMDarkerBlue, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {rust-cdf.csv};
+\addplot [mark=triangle*,color=TUMGreen, thick,mark repeat*=7] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {go-cdf.csv};
+\addplot [mark=+,color=TUMOrange, thick,mark repeat*=20] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {csharp-cdf.csv};
+\addplot [mark=diamond*,color=TUMYellow, thick,mark repeat*=10] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {ocaml-cdf.csv};
+\addplot [mark=pentagon*,color=TUMPurple, thick,mark repeat*=10] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {swift-cdf.csv};
+\addplot [mark=*,color=TUMRed, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {haskell-cdf.csv};
+%\addplot [mark=+,color=TUMIvony, thick,mark repeat*=2] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {python-cdf.csv};
+
+\addplot[mark=none,color=black!60,forget plot,dashed,thick] coordinates {
+(0,0.01)
+(200,0.01)
+};
+\addplot[mark=none,color=black!60,forget plot,dashed,thick] coordinates {
+(0,0.0001)
+(200,0.0001)
+};
+\addplot[mark=none,color=black!60,forget plot,dashed,thick] coordinates {
+(0,0.000001)
+(200,0.000001)
+};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.01) { 99th percentile};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.0001) { 99.99th percentile};
+\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.000001) { 99.9999th percentile};
+\end{axis}
+\end{tikzpicture}
+\end{document}

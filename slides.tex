@@ -70,9 +70,9 @@
 
 % For beamer mode (default):
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
-\author[Paul Emmerich, Simon Ellmann, Sebastian Voit]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, \textbf{Sebastian Voit},\\ Fabian Bonk, Alex Egger, Alexander Frank, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier}
+\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Sebastian Voit,\\ Fabian Bonk, Alex Egger, Alexander Frank, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier}
 \title{Safe and Secure Drivers in High-Level Languages}
-\date{December 29, 2018}
+\date{February 02, 2019}
 
 \makeatletter
 \let\@@magyar@captionfix\relax
@@ -152,10 +152,6 @@
 \begin{itemize}
 \item Rust driver as bachelor's thesis, now HiWi/research assistant
 \end{itemize}
-\emph{Sebastian}
-\begin{itemize}
-\item Go driver as bachelor's thesis
-\end{itemize}
 \emph{Everyone else mentioned on the title slide}
 \begin{itemize}
 \item Did a thesis with Paul as advisor
@@ -164,7 +160,6 @@
 \begin{column}{0.15\textwidth}
 \includegraphics[width=0.8\textwidth]{pics/paul.jpg}\\
 \includegraphics[width=0.8\textwidth]{pics/simon.jpg}\\
-\includegraphics[width=0.8\textwidth]{pics/sebastian.jpg}
 %\end{tikzpicture}
 \end{column}
 \end{columns}
@@ -176,118 +171,131 @@
 \vspace{-1em}\tiny{Intel XL710 [Picture: Intel.com]}
 \end{frame}
 
-\begin{frame}{The ixy project}
+\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
 \begin{itemize}
-\item Attempt to write a simple yet fast user space network driver
-\item It's a user space driver you can easily understand and read
-\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
-\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
-\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
-\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Expectation: Beautiful C code}
-\begin{itemize}
-\item Why write a driver in C?
-\pause
+\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
+\item Commonly found in servers or as on-board chips
+\item Very good datasheet publicly available
 \vspace{1em}
-\item Most drivers are written in C
-\item C is the lowest common denominator of systems programming languages
-\item C code can be beautiful
-\item Everyone can read C?
+\item Almost no logic hidden behind black-box firmware
+%\item<2-> Black-box firmware contains almost no magic
+\item Drivers for many newer NICs often just exchanges messages with the firmware
+\item Here: all hardware features directly exposed to the driver
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Reality: C can be ugly}
-\begin{minted}[autogobble]{c}
-#define mystery_macro(ptr, type, member) ({\
-	const typeof(((type*)0)->member)* __mptr = (ptr);\
-	(type*)((char*)__mptr - offsetof(type, member));\
-})
-\end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Reality: C can be ugly}
-\begin{minted}[autogobble]{c}
-#define container_of(ptr, type, member) ({\
-	const typeof(((type*)0)->member)* __mptr = (ptr);\
-	(type*)((char*)__mptr - offsetof(type, member));\
-})
-\end{minted}
-\end{frame}
-
-
-\begin{frame}[fragile]{Reality: C can be ugly}
-\begin{minted}[autogobble]{c}
-#define container_of(ptr, type, member) ({\
-	const typeof(((type*)0)->member)* __mptr = (ptr);\
-	(type*)((char*)__mptr - offsetof(type, member));\
-})
-\end{minted}
-\begin{itemize}
-\item Allows some ``inheritance'' in C to abstract driver implementations
-\item Virtually all C drivers use this macro
-\item The Linux kernel contains $\approx$ 15,000 uses of this macro
-\end{itemize}
-\end{frame}
-
-\begin{frame}{C can cause security problems}
-\centering\includegraphics[trim={0 13cm 0 0},clip,width=0.65\textwidth]{pics/cve}
-
-\footnotesize (...)
-
-\centering\includegraphics[trim={0 0 0 17.5cm},clip,width=0.65\textwidth]{pics/cve}
-
-\begin{itemize}
-\item Screenshot from \url{https://www.cvedetails.com/}
-\item Security bugs found in the Linux kernel in the last $\approx$ 20 years
-\end{itemize}
-
-\end{frame}
-
-
-\begin{frame}{C can cause security problems}
-\begin{itemize}
-\item Not all bugs can be blamed on the language
-\item Cutler et al. analyzed 65 CVEs categorized as code execution in the Linux kernel \footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018}
-\end{itemize}
-\pause
-\begin{table}
-\centering
-\begin{tabular}{ l  r r l }
-  \toprule
-  Bug type & Num. & Perc. & Can be avoided by language? \\
-  \midrule
-  Various & 11 & 17\% & Unclear/Maybe \\
-  Logic & 14 & 22\% & No \\
-  Use-after-free & 8 & 12\% & Yes \\
-  Out of bounds & 32 & 49\% & Yes (likely leads to panic) \\
-  \bottomrule  
-\end{tabular}
-\caption{Code execution vulnerabilities in the Linux kernel identified by Cutler et al$^1$}
-\end{table}
-\end{frame}
-
-\begin{frame}{Are there preventable bugs in drivers?}
-\begin{itemize}
-\item We looked at these 40 preventable bugs
-\pause
-\item 39 of them were in drivers (the other was in the Bluetooth stack)
-\pause
-\item 13 were in the Qualcomm WiFi driver
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Should you really write new code in C in 2019?}
-\begin{itemize}
-\item If you have a choice: probably not, no
-\pause
-\item User space drivers can be written in \emph{any} language!
-\item But are all languages an equally good choice?
-\item Is a JIT compiler or a garbage collector a problem in a driver?
-\end{itemize}
-\end{frame}
+%\begin{frame}{The ixy project}
+%\begin{itemize}
+%\item Attempt to write a simple yet fast user space network driver
+%\item It's a user space driver you can easily understand and read
+%\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
+%\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
+%\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
+%\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Expectation: Beautiful C code}
+%\begin{itemize}
+%\item Why write a driver in C?
+%\pause
+%\vspace{1em}
+%\item Most drivers are written in C
+%\item C is the lowest common denominator of systems programming languages
+%\item C code can be beautiful
+%\item Everyone can read C?
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Reality: C can be ugly}
+%\begin{minted}[autogobble]{c}
+%#define mystery_macro(ptr, type, member) ({\
+%	const typeof(((type*)0)->member)* __mptr = (ptr);\
+%	(type*)((char*)__mptr - offsetof(type, member));\
+%})
+%\end{minted}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Reality: C can be ugly}
+%\begin{minted}[autogobble]{c}
+%#define container_of(ptr, type, member) ({\
+%	const typeof(((type*)0)->member)* __mptr = (ptr);\
+%	(type*)((char*)__mptr - offsetof(type, member));\
+%})
+%\end{minted}
+%\end{frame}
+%
+%
+%\begin{frame}[fragile]{Reality: C can be ugly}
+%\begin{minted}[autogobble]{c}
+%#define container_of(ptr, type, member) ({\
+%	const typeof(((type*)0)->member)* __mptr = (ptr);\
+%	(type*)((char*)__mptr - offsetof(type, member));\
+%})
+%\end{minted}
+%\begin{itemize}
+%\item Allows some ``inheritance'' in C to abstract driver implementations
+%\item Virtually all C drivers use this macro
+%\item The Linux kernel contains $\approx$ 15,000 uses of this macro
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{C can cause security problems}
+%\centering\includegraphics[trim={0 13cm 0 0},clip,width=0.65\textwidth]{pics/cve}
+%
+%\footnotesize (...)
+%
+%\centering\includegraphics[trim={0 0 0 17.5cm},clip,width=0.65\textwidth]{pics/cve}
+%
+%\begin{itemize}
+%\item Screenshot from \url{https://www.cvedetails.com/}
+%\item Security bugs found in the Linux kernel in the last $\approx$ 20 years
+%\end{itemize}
+%
+%\end{frame}
+%
+%
+%\begin{frame}{C can cause security problems}
+%\begin{itemize}
+%\item Not all bugs can be blamed on the language
+%\item Cutler et al. analyzed 65 CVEs categorized as code execution in the Linux kernel \footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018}
+%\end{itemize}
+%\pause
+%\begin{table}
+%\centering
+%\begin{tabular}{ l  r r l }
+%  \toprule
+%  Bug type & Num. & Perc. & Can be avoided by language? \\
+%  \midrule
+%  Various & 11 & 17\% & Unclear/Maybe \\
+%  Logic & 14 & 22\% & No \\
+%  Use-after-free & 8 & 12\% & Yes \\
+%  Out of bounds & 32 & 49\% & Yes (likely leads to panic) \\
+%  \bottomrule  
+%\end{tabular}
+%\caption{Code execution vulnerabilities in the Linux kernel identified by Cutler et al$^1$}
+%\end{table}
+%\end{frame}
+%
+%\begin{frame}{Are there preventable bugs in drivers?}
+%\begin{itemize}
+%\item We looked at these 40 preventable bugs
+%\pause
+%\item 39 of them were in drivers (the other was in the Bluetooth stack)
+%\pause
+%\item 13 were in the Qualcomm WiFi driver
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Should you really write new code in C in 2019?}
+%\begin{itemize}
+%\item If you have a choice: probably not, no
+%\pause
+%\item User space drivers can be written in \emph{any} language!
+%\item But are all languages an equally good choice?
+%\item Is a JIT compiler or a garbage collector a problem in a driver?
+%\end{itemize}
+%\end{frame}
 
 \setbeamertemplate{footline}{}
 \setbeamertemplate{headline}{}
@@ -364,73 +372,73 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
-\begin{itemize}
-\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
-\item Commonly found in servers or as on-board chips
-\item Very good datasheet publicly available
-\vspace{1em}
-\item Almost no logic hidden behind black-box firmware
-%\item<2-> Black-box firmware contains almost no magic
-\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
-\item<2-> Here: all hardware features directly exposed to the driver
-\end{itemize}
-\end{frame}
+%\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
+%\begin{itemize}
+%\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
+%\item Commonly found in servers or as on-board chips
+%\item Very good datasheet publicly available
+%\vspace{1em}
+%\item Almost no logic hidden behind black-box firmware
+%%\item<2-> Black-box firmware contains almost no magic
+%\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
+%\item<2-> Here: all hardware features directly exposed to the driver
+%\end{itemize}
+%\end{frame}
 
 
 
 \newmintinline[ccode]{c}{}
 \newmintinline[bashcode]{c}{}
 
-\begin{frame}[fragile=singleslide]{Find the device we want to use}
-\begin{Verbatim}[commandchars=\\\{\}]
-# lspci
-03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\end{Verbatim}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Find the device we want to use}
-\begin{Verbatim}[commandchars=\\\{\}]
-# lspci
-\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-\end{Verbatim}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Unload the kernel driver}
-\begin{minted}{bash}
-echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
-\end{minted}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe register address space from user space}
-\begin{minted}[autogobble]{c}
-int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
-struct stat stat;
-fstat(fd, &stat);
-uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
-                                     MAP_SHARED, fd, 0);
-\end{minted}
-\end{frame}
-
-\begin{frame}{Device registers}
-\centering\includegraphics[width=0.75\textwidth]{pics/registers}
-\end{frame}
-
-\begin{frame}[fragile=singleslide]{Access registers: LEDs}
-\begin{minted}[autogobble]{c}
-#define LEDCTL 0x00200
-#define LED0_BLINK_OFFS 7
-
-uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
-*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
-\end{minted}
-\begin{itemize}
-\item Memory-mapped IO: all memory accesses go directly to the NIC
-\item One of the very few valid uses of \ccode{volatile} in C
-\end{itemize}
-\end{frame}
+%\begin{frame}[fragile=singleslide]{Find the device we want to use}
+%\begin{Verbatim}[commandchars=\\\{\}]
+%# lspci
+%03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+%03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+%\end{Verbatim}
+%\end{frame}
+%
+%\begin{frame}[fragile=singleslide]{Find the device we want to use}
+%\begin{Verbatim}[commandchars=\\\{\}]
+%# lspci
+%\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+%\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+%\end{Verbatim}
+%\end{frame}
+%
+%\begin{frame}[fragile=singleslide]{Unload the kernel driver}
+%\begin{minted}{bash}
+%echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
+%\end{minted}
+%\end{frame}
+%
+%\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe register address space from user space}
+%\begin{minted}[autogobble]{c}
+%int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
+%struct stat stat;
+%fstat(fd, &stat);
+%uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
+%                                     MAP_SHARED, fd, 0);
+%\end{minted}
+%\end{frame}
+%
+%\begin{frame}{Device registers}
+%\centering\includegraphics[width=0.75\textwidth]{pics/registers}
+%\end{frame}
+%
+%\begin{frame}[fragile=singleslide]{Access registers: LEDs}
+%\begin{minted}[autogobble]{c}
+%#define LEDCTL 0x00200
+%#define LED0_BLINK_OFFS 7
+%
+%uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
+%*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
+%\end{minted}
+%\begin{itemize}
+%\item Memory-mapped IO: all memory accesses go directly to the NIC
+%\item One of the very few valid uses of \ccode{volatile} in C
+%\end{itemize}
+%\end{frame}
 
 
 \begin{frame}{Handling packets via DMA}
@@ -467,344 +475,344 @@ uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
 \end{itemize}
 \end{frame}
 
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\setbeamertemplate{headline}[tumheadline]
-\setbeamertemplate{footline}[tumfootline]
-\begin{frame}{}
-\centering \scalebox{4}{\Huge C\#}
-\end{frame}
-
-
-\begin{frame}{C\#}
-\begin{itemize}
-\item No, we didn't develop a Windows driver
-\item We used Microsoft's CoreCLR on Linux
-\pause
-\vspace{1em}
-\item JIT compiled
-\item Garbage collected
-\item Memory safe (mostly)
-\pause
-\vspace{1em}
-\item C\# supports a relatively obscure \emph{unsafe mode}
-\item Unsafe mode features full support for pointers
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{C\#: Access to external memory}
-\begin{itemize}
-\item C\# provides \texttt{UnmanagedMemoryStream}, a nice wrapper for foreign memory
-\item But it was too slow :(
-\pause
-\item Use unsafe raw pointers for packet buffers instead
-\end{itemize}
-\begin{minted}[autogobble]{csharp}
-public unsafe void WriteData(uint offset, int val) {
-    if (offset >= BUF_SIZE) throw new IndexOutOfRangeException();
-    volatile int *ptr = (volatile int*)(_baseAddress + DataOffset + offset);
-    *ptr = val;
-}
-\end{minted}
-\begin{itemize}
-\pause
-\item Looks a lot like C
-\item Potentially unsafe operations are all in a few known places, simpler auditing
-\end{itemize}
-\end{frame}
-
-
-%\begin{frame}[]{C\#: Summary}
-%\begin{itemize}
-%\item ???
-%\end{itemize}
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\setbeamertemplate{headline}[tumheadline]
+%\setbeamertemplate{footline}[tumfootline]
+%\begin{frame}{}
+%\centering \scalebox{4}{\Huge C\#}
 %\end{frame}
-
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\begin{frame}{}
-\centering\includegraphics[width=0.8\textwidth]{pics/swift}
-\end{frame}
-\setbeamertemplate{headline}[tumheadline]
-\setbeamertemplate{footline}[tumfootline]
-
-\begin{frame}{Swift}
-\begin{itemize}
-\item No, we didn't develop a macOS/iOS driver
-\item Swift is also available on Linux
-\pause
-\vspace{1em}
-\item Compiled via LLVM
-\item Memory management via reference counting (ARC)
-\item Memory safe (mostly)
+%
+%
+%\begin{frame}{C\#}
+%\begin{itemize}
+%\item No, we didn't develop a Windows driver
+%\item We used Microsoft's CoreCLR on Linux
 %\pause
 %\vspace{1em}
-%\item Access to external memory via \texttt{UnsafeBufferPointer} 
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Swift: Pointers}
-\begin{itemize}
-\item \texttt{UnsafeBufferPointer} and co wrap foreign memory blobs
-\item Used to make packets in DMA buffers available
-\end{itemize}
-\begin{minted}[autogobble]{swift}
-public var packetData: UnsafeBufferPointer<UInt8>? {
-    get {
-        return UnsafeBufferPointer<UInt8>(
-            start: self.entry.pointer.assumingMemoryBound(to: UInt8.self),
-            count: Int(self.size)
-        )
-    }
-}
-\end{minted}
-\begin{itemize}
-\item Forces you to specify the buffer size, accesses check the bounds in debug mode
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Swift: Pointers with a very verbose syntax}
-\begin{itemize}
-\item Example: modify one byte in a packet (part of our benchmark)
-\end{itemize}
-\begin{minted}[autogobble]{swift}
-public func touch() {
-    let ptr = self.entry.pointer
-    var newValue: UInt32 = ptr.load(fromByteOffset: 0, as: UInt32.self)
-    newValue += 1
-    ptr.storeBytes(of: newValue, toByteOffset: 0, as: UInt32.self)
-}
-\end{minted}
-\begin{itemize}
-\item Quite verbose compared to C or C\#
-\end{itemize}
-\end{frame}
-
-
-
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\begin{frame}{}
-\centering\includegraphics[width=0.8\textwidth]{pics/ocaml}
-\end{frame}
-\setbeamertemplate{headline}[tumheadline]
-\setbeamertemplate{footline}[tumfootline]
-
-\begin{frame}{OCaml}
-\begin{itemize}
-\item Compiled language
-\item Memory management via garbage collection
-\item Memory safe
-\item Functional language
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]{OCaml: Cstruct}
-\begin{minted}[autogobble]{ocaml}
-[%%cstruct
-  type adv_rxd_wb = {
-    pkt_info : uint16;
-    hdr_info : uint16;
-    ip_id : uint16;
-    csum : uint16;
-    status_error : uint32;
-    length : uint16;
-    vlan : uint16
-  } [@@little_endian]
-]
-\end{minted}
-\begin{itemize}
-\item Cstruct generates accessors to work with (foreign) memory that looks like this
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{OCaml: It looks quite different}
-\begin{itemize}
-\item Code that checks how many packets are ready to be read in the receive ring
-\end{itemize}
-\begin{minted}[autogobble]{ocaml}
-let num_done =
-  (* counting without mutation *)
-  let rec loop offset =
-    let rxd = descriptors.(wrap_rx (rxq.rx_index + offset)) in
-    if Int32.((get_adv_rx_wb_status rxd) land RXD.stat_dd <> 0l) then
-      loop (offset + 1)
-    else
-      offset in
-  loop 0
-\end{minted}
-\end{frame}
-
-
+%\item JIT compiled
+%\item Garbage collected
+%\item Memory safe (mostly)
+%\pause
+%\vspace{1em}
+%\item C\# supports a relatively obscure \emph{unsafe mode}
+%\item Unsafe mode features full support for pointers
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}[fragile]{C\#: Access to external memory}
+%\begin{itemize}
+%\item C\# provides \texttt{UnmanagedMemoryStream}, a nice wrapper for foreign memory
+%\item But it was too slow :(
+%\pause
+%\item Use unsafe raw pointers for packet buffers instead
+%\end{itemize}
+%\begin{minted}[autogobble]{csharp}
+%public unsafe void WriteData(uint offset, int val) {
+%    if (offset >= BUF_SIZE) throw new IndexOutOfRangeException();
+%    volatile int *ptr = (volatile int*)(_baseAddress + DataOffset + offset);
+%    *ptr = val;
+%}
+%\end{minted}
+%\begin{itemize}
+%\pause
+%\item Looks a lot like C
+%\item Potentially unsafe operations are all in a few known places, simpler auditing
+%\end{itemize}
+%\end{frame}
+%
+%
+%%\begin{frame}[]{C\#: Summary}
+%%\begin{itemize}
+%%\item ???
+%%\end{itemize}
+%%\end{frame}
+%
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\begin{frame}{}
+%\centering\includegraphics[width=0.8\textwidth]{pics/swift}
+%\end{frame}
+%\setbeamertemplate{headline}[tumheadline]
+%\setbeamertemplate{footline}[tumfootline]
+%
+%\begin{frame}{Swift}
+%\begin{itemize}
+%\item No, we didn't develop a macOS/iOS driver
+%\item Swift is also available on Linux
+%\pause
+%\vspace{1em}
+%\item Compiled via LLVM
+%\item Memory management via reference counting (ARC)
+%\item Memory safe (mostly)
+%%\pause
+%%\vspace{1em}
+%%\item Access to external memory via \texttt{UnsafeBufferPointer} 
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Swift: Pointers}
+%\begin{itemize}
+%\item \texttt{UnsafeBufferPointer} and co wrap foreign memory blobs
+%\item Used to make packets in DMA buffers available
+%\end{itemize}
+%\begin{minted}[autogobble]{swift}
+%public var packetData: UnsafeBufferPointer<UInt8>? {
+%    get {
+%        return UnsafeBufferPointer<UInt8>(
+%            start: self.entry.pointer.assumingMemoryBound(to: UInt8.self),
+%            count: Int(self.size)
+%        )
+%    }
+%}
+%\end{minted}
+%\begin{itemize}
+%\item Forces you to specify the buffer size, accesses check the bounds in debug mode
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Swift: Pointers with a very verbose syntax}
+%\begin{itemize}
+%\item Example: modify one byte in a packet (part of our benchmark)
+%\end{itemize}
+%\begin{minted}[autogobble]{swift}
+%public func touch() {
+%    let ptr = self.entry.pointer
+%    var newValue: UInt32 = ptr.load(fromByteOffset: 0, as: UInt32.self)
+%    newValue += 1
+%    ptr.storeBytes(of: newValue, toByteOffset: 0, as: UInt32.self)
+%}
+%\end{minted}
+%\begin{itemize}
+%\item Quite verbose compared to C or C\#
+%\end{itemize}
+%\end{frame}
+%
+%
+%
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\begin{frame}{}
+%\centering\includegraphics[width=0.8\textwidth]{pics/ocaml}
+%\end{frame}
+%\setbeamertemplate{headline}[tumheadline]
+%\setbeamertemplate{footline}[tumfootline]
+%
+%\begin{frame}{OCaml}
+%\begin{itemize}
+%\item Compiled language
+%\item Memory management via garbage collection
+%\item Memory safe
+%\item Functional language
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}[fragile]{OCaml: Cstruct}
+%\begin{minted}[autogobble]{ocaml}
+%[%%cstruct
+%  type adv_rxd_wb = {
+%    pkt_info : uint16;
+%    hdr_info : uint16;
+%    ip_id : uint16;
+%    csum : uint16;
+%    status_error : uint32;
+%    length : uint16;
+%    vlan : uint16
+%  } [@@little_endian]
+%]
+%\end{minted}
+%\begin{itemize}
+%\item Cstruct generates accessors to work with (foreign) memory that looks like this
+%\end{itemize}
+%\end{frame}
+%
 %\begin{frame}[fragile]{OCaml: It looks quite different}
 %\begin{itemize}
-%\item Example of the forwarder application on top of the driver
+%\item Code that checks how many packets are ready to be read in the receive ring
 %\end{itemize}
 %\begin{minted}[autogobble]{ocaml}
-%let forward rx_dev tx_dev =
-%  let rx = Ixy.rx_batch rx_dev 0 in
-%  Ixy.tx_batch_busy_wait tx_dev 0 rx
+%let num_done =
+%  (* counting without mutation *)
+%  let rec loop offset =
+%    let rxd = descriptors.(wrap_rx (rxq.rx_index + offset)) in
+%    if Int32.((get_adv_rx_wb_status rxd) land RXD.stat_dd <> 0l) then
+%      loop (offset + 1)
+%    else
+%      offset in
+%  loop 0
 %\end{minted}
 %\end{frame}
-
-
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\begin{frame}{}
-\centering\includegraphics[width=0.6\textwidth]{pics/haskell}
-\end{frame}
-\setbeamertemplate{headline}[tumheadline]
-\setbeamertemplate{footline}[tumfootline]
-
-\begin{frame}{Haskell}
-\begin{itemize}
-\item Compiled language (GHC)
-\item Memory management via garbage collection
-\item Memory safe
-\item Functional language
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Haskell: Access to foreign memory}
-\begin{itemize}
-\item \texttt{mmap} and \texttt{mlock} available via \texttt{System.Posix.Memory}
-\begin{itemize}
-\item All necessary flags and features are available in Haskell, we had to write some C code to get \texttt{mmap/mlock} in OCaml
-\end{itemize}
-\vspace{1em}
-\item \texttt{Foreign} package provides access to foreign memory
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]{Haskell: Sum types are useful}
-\begin{itemize}
-\item Descriptors often exist in two forms
-\begin{itemize}
-\item One format written by the driver and read by the device
-\item A second format that is written back by the device once it's finished
-\end{itemize}
-\end{itemize}
-\begin{minted}{haskell}
-data TransmitDescriptor = TransmitRead { tdBufPhysAddr :: !Word64
-                                       , tdCmdTypeLen :: !Word32
-                                       , tdOlInfoStatus :: !Word32 }
-                          | TransmitWriteback { tdStatus :: !Word32 }
-\end{minted}
-\end{frame}
-
-
-%\begin{frame}[fragile]{Haskell: How to write a TX descriptor}
+%
+%
+%%\begin{frame}[fragile]{OCaml: It looks quite different}
+%%\begin{itemize}
+%%\item Example of the forwarder application on top of the driver
+%%\end{itemize}
+%%\begin{minted}[autogobble]{ocaml}
+%%let forward rx_dev tx_dev =
+%%  let rx = Ixy.rx_batch rx_dev 0 in
+%%  Ixy.tx_batch_busy_wait tx_dev 0 rx
+%%\end{minted}
+%%\end{frame}
+%
+%
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\begin{frame}{}
+%\centering\includegraphics[width=0.6\textwidth]{pics/haskell}
+%\end{frame}
+%\setbeamertemplate{headline}[tumheadline]
+%\setbeamertemplate{footline}[tumfootline]
+%
+%\begin{frame}{Haskell}
+%\begin{itemize}
+%\item Compiled language (GHC)
+%\item Memory management via garbage collection
+%\item Memory safe
+%\item Functional language
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}{Haskell: Access to foreign memory}
+%\begin{itemize}
+%\item \texttt{mmap} and \texttt{mlock} available via \texttt{System.Posix.Memory}
+%\begin{itemize}
+%\item All necessary flags and features are available in Haskell, we had to write some C code to get \texttt{mmap/mlock} in OCaml
+%\end{itemize}
+%\vspace{1em}
+%\item \texttt{Foreign} package provides access to foreign memory
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}[fragile]{Haskell: Sum types are useful}
+%\begin{itemize}
+%\item Descriptors often exist in two forms
+%\begin{itemize}
+%\item One format written by the driver and read by the device
+%\item A second format that is written back by the device once it's finished
+%\end{itemize}
+%\end{itemize}
 %\begin{minted}{haskell}
-%unsafeUseAsCStringLen pkt (\(ptr, len) -> copyBytes bufPtr (castPtr ptr) len)
-%poke descPtr TransmitRead { tdBufPhysAddr = bufPhysAddr 
-%                          , tdCmdTypeLen = fromIntegral $ cmdTypeLen size
-%                          , tdOlInfoStatus = fromIntegral $ shift size 14 }
-%writeIORef (txqIndexRef queue) nextIndex
+%data TransmitDescriptor = TransmitRead { tdBufPhysAddr :: !Word64
+%                                       , tdCmdTypeLen :: !Word32
+%                                       , tdOlInfoStatus :: !Word32 }
+%                          | TransmitWriteback { tdStatus :: !Word32 }
+%\end{minted}
+%\end{frame}
+%
+%
+%%\begin{frame}[fragile]{Haskell: How to write a TX descriptor}
+%%\begin{minted}{haskell}
+%%unsafeUseAsCStringLen pkt (\(ptr, len) -> copyBytes bufPtr (castPtr ptr) len)
+%%poke descPtr TransmitRead { tdBufPhysAddr = bufPhysAddr 
+%%                          , tdCmdTypeLen = fromIntegral $ cmdTypeLen size
+%%                          , tdOlInfoStatus = fromIntegral $ shift size 14 }
+%%writeIORef (txqIndexRef queue) nextIndex
+%%\end{minted}
+%%\end{frame}
+%
+%
+%
+%
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\begin{frame}{}
+%\centering\includegraphics[width=0.8\textwidth]{pics/go}
+%\end{frame}
+%\setbeamertemplate{headline}[tumheadline]
+%\setbeamertemplate{footline}[tumfootline]
+%
+%\begin{frame}{Go}
+%\begin{itemize}
+%\item Compiled programming language developed by Google 
+%\item General purpose language but designed for distributed systems
+%\item<2-> A driver is not a distributed system
+%\item<3-> Then why even use Go?
+%\begin{itemize}
+%\item<4-> Runtime for:\\Garbage Collection\\Memory \& Type safety
+%%\item<4-> Simple yet powerful concurrency via goroutines	%not relevant ofr a single core driver
+%\item<4-> Large standard library
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Go for drivers}
+%\begin{itemize}
+%\item Actually a lot like C in many aspects
+%%maybe include some code examples?
+%\item<2-> Main differences:
+%\begin{itemize}
+%\item<2-> No pointer arithmetic (managing DMA memory)
+%\item<2-> No volatile (memory barriers for register access)
+%\end{itemize}
+%\item<3-> What we do instead:
+%\begin{itemize}
+%\item<3-> Manage DMA memory via slices
+%\item<3-> Unsafe pointers: circumvent runtime but allow arbitrary pointer\\
+%	$\rightarrow$ Physical address calculation \& register access
+%\item<3-> Rule set for unsafe pointers to still be valid
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%%\begin{frame}[fragile]{Managing memory: mempools}
+%%\begin{itemize}
+%%\item syscall.Mmap() returns slice of the mmapped memory area
+%%\item For this presentation: slice = fancy array\\
+%%	$\rightarrow$ bounds checked, subslicing, etc.
+%%\end{itemize}
+%%%\end{frame}
+%%
+%%%\begin{frame}[fragile]{func MemoryAllocateMempool}
+%%%mempool alloc code
+%%\begin{minted}[autogobble]{go}
+%%//allocate DMA memory & initialize mempool
+%%for i := uint32(0); i < numEntries; i++ {
+%%	mempool.packetBuf[i] = &PktBuf{
+%%		Pkt:        mempool.buf[i*entrySize : (i+1)*entrySize],
+%%		PhyAddr:    uint64(virtToPhys(uintptr(
+%%			    unsafe.Pointer(&mempool.buf[i*entrySize])))),
+%%	}
+%%}
+%%\end{minted}
+%%\end{frame}
+%
+%\begin{frame}[fragile]{No volatile, no problem}
+%%insert code registers
+%\begin{itemize}
+%\item Registers share memory with NIC
+%\item Compiler memory barrier to prevent re-ordering
+%\item sync/atomic functions prevent re-ordering around them
+%\end{itemize}
+%\begin{minted}[autogobble]{go}
+%func setReg32(addr []byte, reg int, value uint32) {
+%	atomic.StoreUint32((*uint32)(unsafe.Pointer(&addr[reg])), value)
+%}
+%
+%func getReg32(addr []byte, reg int) uint32 {
+%	return atomic.LoadUint32((*uint32)(unsafe.Pointer(&addr[reg])))
+%}
 %\end{minted}
 %\end{frame}
 
-
-
-
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\begin{frame}{}
-\centering\includegraphics[width=0.8\textwidth]{pics/go}
-\end{frame}
-\setbeamertemplate{headline}[tumheadline]
-\setbeamertemplate{footline}[tumfootline]
-
-\begin{frame}{Go}
-\begin{itemize}
-\item Compiled programming language developed by Google 
-\item General purpose language but designed for distributed systems
-\item<2-> A driver is not a distributed system
-\item<3-> Then why even use Go?
-\begin{itemize}
-\item<4-> Runtime for:\\Garbage Collection\\Memory \& Type safety
-%\item<4-> Simple yet powerful concurrency via goroutines	%not relevant ofr a single core driver
-\item<4-> Large standard library
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Go for drivers}
-\begin{itemize}
-\item Actually a lot like C in many aspects
-%maybe include some code examples?
-\item<2-> Main differences:
-\begin{itemize}
-\item<2-> No pointer arithmetic (managing DMA memory)
-\item<2-> No volatile (memory barriers for register access)
-\end{itemize}
-\item<3-> What we do instead:
-\begin{itemize}
-\item<3-> Manage DMA memory via slices
-\item<3-> Unsafe pointers: circumvent runtime but allow arbitrary pointer\\
-	$\rightarrow$ Physical address calculation \& register access
-\item<3-> Rule set for unsafe pointers to still be valid
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Managing memory: mempools}
-\begin{itemize}
-\item syscall.Mmap() returns slice of the mmapped memory area
-\item For this presentation: slice = fancy array\\
-	$\rightarrow$ bounds checked, subslicing, etc.
-\end{itemize}
+%\begin{frame}{Conclusion Go}
+%\begin{itemize}
+%\item Actually quite nice to work with
+%\begin{itemize}
+%\item Safety (see Cutler et al.\footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018})
+%\item Looks like C in beautiful
+%\end{itemize}
+%\item<2-> But
+%\begin{itemize}
+%\item<2-> Approx 10\% slower then C % at optimum batch size
+%%\item<2-> Needs higher batch sizes to be efficient
+%\item<2-> Descriptor access can be ugly (functions on descriptors are too costly)
+%\end{itemize}
+%\end{itemize}
 %\end{frame}
-
-%\begin{frame}[fragile]{func MemoryAllocateMempool}
-%mempool alloc code
-\begin{minted}[autogobble]{go}
-//allocate DMA memory & initialize mempool
-for i := uint32(0); i < numEntries; i++ {
-	mempool.packetBuf[i] = &PktBuf{
-		Pkt:        mempool.buf[i*entrySize : (i+1)*entrySize],
-		PhyAddr:    uint64(virtToPhys(uintptr(
-			    unsafe.Pointer(&mempool.buf[i*entrySize])))),
-	}
-}
-\end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{No volatile, no problem}
-%insert code registers
-\begin{itemize}
-\item Registers share memory with NIC
-\item Compiler memory barrier to prevent re-ordering
-\item sync/atomic functions prevent re-ordering around them
-\end{itemize}
-\begin{minted}[autogobble]{go}
-func setReg32(addr []byte, reg int, value uint32) {
-	atomic.StoreUint32((*uint32)(unsafe.Pointer(&addr[reg])), value)
-}
-
-func getReg32(addr []byte, reg int) uint32 {
-	return atomic.LoadUint32((*uint32)(unsafe.Pointer(&addr[reg])))
-}
-\end{minted}
-\end{frame}
-
-\begin{frame}{Conclusion Go}
-\begin{itemize}
-\item Actually quite nice to work with
-\begin{itemize}
-\item Safety (see Cutler et al.\footnote{C. Cutler, M. F. Kaashoek, and R. T. Morris, \emph{``The benefits and costs of writing a POSIX kernel in a high-level language''}, USENIX OSDI, 2018})
-\item Looks like C in beautiful
-\end{itemize}
-\item<2-> But
-\begin{itemize}
-\item<2-> Approx 10\% slower then C % at optimum batch size
-%\item<2-> Needs higher batch sizes to be efficient
-\item<2-> Descriptor access can be ugly (functions on descriptors are too costly)
-\end{itemize}
-\end{itemize}
-\end{frame}
 
 \setbeamertemplate{footline}{}
 \setbeamertemplate{headline}{}
@@ -819,7 +827,6 @@ func getReg32(addr []byte, reg int) uint32 {
 \begin{quote}
 A safe, concurrent, practical systems language.
 \end{quote}\\
-Great! That's what we are looking for! Anything else we need to know?\\
 \begin{itemize}
 \item No garbage collector
 \item Unique ownership system and rules for moving/borrowing values
@@ -907,12 +914,16 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \setbeamertemplate{headline}[tumheadline]
 
 
-\begin{frame}{Performance comparison (single CPU core)}
-\centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
-\end{frame}
+%\begin{frame}{Performance comparison (single CPU core)}
+%\centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
+%\end{frame}
 
 \begin{frame}{Batching at 1.6\,GHz CPU speed}
-\centering\includestandalone[scale=0.8]{figures/benchmarks-all-batching}
+\centering\includegraphics[scale=1.1]{figures/batches-16.pdf}
+\end{frame}
+
+\begin{frame}{Batching at 3.3\,GHz CPU speed}
+\centering\includegraphics[scale=1.1]{figures/batches-33.pdf}
 \end{frame}
 
 \setbeamertemplate{footline}{}
@@ -935,30 +946,37 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Garbage collection and JIT compilation vs. latency}
-\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
-\end{frame}
+%\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
+%\end{frame}
+%
+%\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf2}
+%\end{frame}
+%
+%\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf3}
+%\end{frame}
+%
+%\begin{frame}{Garbage collection and JIT compilation vs. latency}
+%\centering\includestandalone[scale=0.8]{figures/latency-cdf4}
+%\end{frame}
+%
+%\begin{frame}{Complementary cumulative distribution function}
+%\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
+%\end{frame}
 
-\begin{frame}{Garbage collection and JIT compilation vs. latency}
-\centering\includestandalone[scale=0.8]{figures/latency-cdf2}
-\end{frame}
-
-\begin{frame}{Garbage collection and JIT compilation vs. latency}
-\centering\includestandalone[scale=0.8]{figures/latency-cdf3}
-\end{frame}
-
-\begin{frame}{Garbage collection and JIT compilation vs. latency}
-\centering\includestandalone[scale=0.8]{figures/latency-cdf4}
-\end{frame}
-
-\begin{frame}{Complementary cumulative distribution function}
-\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
+\begin{frame}{Tail latency}
+\centering\includegraphics[scale=1.1]{figures/latency-1/latency-ccdf.pdf}
 \end{frame}
 
 \begin{frame}{Tail latency}
-\centering\includestandalone[scale=0.8]{figures/latency-hdr-hist}
+\centering\includegraphics[scale=1.1]{figures/latency-10/latency-ccdf.pdf}
 \end{frame}
 
+\begin{frame}{Tail latency}
+\centering\includegraphics[scale=1.1]{figures/latency-20/latency-ccdf.pdf}
+\end{frame}
 
 \begin{frame}{Look ma, no root}
 \begin{itemize}
