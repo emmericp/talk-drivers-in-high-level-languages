@@ -70,8 +70,8 @@
 
 % For beamer mode (default):
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
-\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Sebastian Voit,\\ Fabian Bonk, Alex Egger, Alexander Frank, Thomas Günzel,\\ Stefan Huber,  Maximilian Pudelko, Maximilian Stadlmeier}
-\title{Safe and Secure Drivers in High-Level Languages}
+\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger,\\ Alexander Frank, Thomas Günzel, Stefan Huber, Alexandru Obada,\\ Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
+\title{Writing Network Drivers in High-Level Languages}
 \date{February 02, 2019}
 
 \makeatletter
@@ -115,19 +115,20 @@
   \strut\textcolor{TUMBlue}{\inserttitle}%
   \\[4ex]%
   \normalsize%
-  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Sebastian Voit$^3$,\\ Fabian Bonk$^4$, Alex Egger$^5$, Alexander Frank$^6$, Thomas Günzel$^7$,\\ Stefan Huber$^8$, Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$ \normalfont %
+  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$,\\ Alexander Frank$^5$, Thomas Günzel$^6$, Stefan Huber$^7$, Alexandru Obada$^8$,\\ Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$, Sebastian Voit$^{11}$ \normalfont %
   \\[2ex]%
   \footnotesize%
   $^1$C, thesis advisor\hspace{1em}
   $^2$Rust\hspace{1em}
-  $^3$Go\hspace{1em}
-  $^4$OCaml\hspace{1em}
-  $^5$Haskell\hspace{1em}\\
-  $^6$Latency measurements\hspace{1em}
-  $^7$Swift\hspace{1em}
-  $^8$IOMMU\hspace{1em}
+  $^3$OCaml\hspace{1em}
+  $^4$Haskell\hspace{1em}
+  $^5$Latency measurements\hspace{1em}\\
+  $^6$Swift\hspace{1em}
+  $^7$IOMMU\hspace{1em}
+  $^8$Python\hspace{1em}
   $^9$VirtIO driver\hspace{1em}
   $^{10}$C\#\hspace{1em}
+  $^{11}$Go\hspace{1em}
   \\[4ex]%
     \ifdefined\departmentname%
     \ifdefined\chairname%
@@ -171,30 +172,17 @@
 \vspace{-1em}\tiny{Intel XL710 [Picture: Intel.com]}
 \end{frame}
 
-\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
+\begin{frame}{The ixy project}
 \begin{itemize}
-\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
-\item Commonly found in servers or as on-board chips
-\item Very good datasheet publicly available
-\vspace{1em}
-\item Almost no logic hidden behind black-box firmware
-%\item<2-> Black-box firmware contains almost no magic
-\item Drivers for many newer NICs often just exchanges messages with the firmware
-\item Here: all hardware features directly exposed to the driver
+\item Attempt to write a simple yet fast user space network driver
+\item It's a user space driver you can easily understand and read
+\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
+\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
+\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
+\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
 \end{itemize}
 \end{frame}
 
-%\begin{frame}{The ixy project}
-%\begin{itemize}
-%\item Attempt to write a simple yet fast user space network driver
-%\item It's a user space driver you can easily understand and read
-%\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
-%\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
-%\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
-%\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
-%\end{itemize}
-%\end{frame}
-%
 %\begin{frame}{Expectation: Beautiful C code}
 %\begin{itemize}
 %\item Why write a driver in C?
@@ -473,6 +461,50 @@
 \item Use language safety features where possible
 \item Quantify trade-offs for performance vs. safety
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Our languages}
+\begin{figure}
+    \centering
+
+    \begin{subfigure}[t]{0.2\textwidth}
+        \centering
+        \scalebox{1.5}{\Huge C\#}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{pics/swift}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{pics/ocaml}
+    \end{subfigure}
+    \\
+    \vspace{2.5em}
+    \centering
+    ~ 
+    \begin{subfigure}[t]{0.2\columnwidth}
+        \centering
+        \includegraphics[width=0.5\textwidth]{pics/haskell}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[t]{0.2\columnwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{pics/go}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[t]{0.2\columnwidth}
+        \centering
+        \includegraphics[width=0.45\textwidth]{pics/rust}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[t]{0.3\columnwidth}
+	\centering
+        \includegraphics[width=0.9\textwidth]{pics/python}
+    \end{subfigure}
+\end{figure}
 \end{frame}
 
 %\setbeamertemplate{footline}{}
@@ -918,33 +950,29 @@ fn set_reg32(&self, reg: u32, val: u32) {
 %\centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 %\end{frame}
 
-\begin{frame}{Batching at 1.6\,GHz CPU speed}
-\centering\includegraphics[scale=1.1]{figures/batches-16.pdf}
-\end{frame}
-
 \begin{frame}{Batching at 3.3\,GHz CPU speed}
 \centering\includegraphics[scale=1.1]{figures/batches-33.pdf}
 \end{frame}
 
-\setbeamertemplate{footline}{}
-\setbeamertemplate{headline}{}
-\begin{frame}{Swift: Flame graph}
-\hspace{-.5cm}\includegraphics[width=1.065\textwidth]{pics/flamegraph}
-\end{frame}
-\setbeamertemplate{footline}[tumfootline]
-\setbeamertemplate{headline}[tumheadline]
-
-\begin{frame}{Swift: Why so slow?}
-\begin{itemize}
-\item Lots of time spent in Swift's memory management
-\item Swift adds calls to release/retain for each used object in each function
-\item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
-\vspace{1em}
-\pause
-\item Time in release/retain: 76\%
-\item For comparison: Go spends less than 0.5\% in the garbage collector
-\end{itemize}
-\end{frame}
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{headline}{}
+%\begin{frame}{Swift: Flame graph}
+%\hspace{-.5cm}\includegraphics[width=1.065\textwidth]{pics/flamegraph}
+%\end{frame}
+%\setbeamertemplate{footline}[tumfootline]
+%\setbeamertemplate{headline}[tumheadline]
+%
+%\begin{frame}{Swift: Why so slow?}
+%\begin{itemize}
+%\item Lots of time spent in Swift's memory management
+%\item Swift adds calls to release/retain for each used object in each function
+%\item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
+%\vspace{1em}
+%\pause
+%\item Time in release/retain: 76\%
+%\item For comparison: Go spends less than 0.5\% in the garbage collector
+%\end{itemize}
+%\end{frame}
 
 %\begin{frame}{Garbage collection and JIT compilation vs. latency}
 %\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
@@ -1018,52 +1046,52 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \centering\includestandalone[scale=.75]{figures/iommu6}
 \end{frame}
 
-\begin{frame}{Unprivileged user space drivers on Linux}
-\begin{itemize}
-\item[1.] Prepare the system as root
-\begin{itemize}
-\item[1.1.] Bind the device to the special \texttt{vfio} driver
-\item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
-\item[1.3.] Allow your user to lock some amount of memory via \texttt{ulimit}
-\end{itemize}
-\pause
-\item[2.] \texttt{mmap} the special magic \texttt{vfio} device
-\item[3.] Do some magic \texttt{ioctl} calls on the magic device
-\item[4.] Protected DMA memory can also be allocated via an \texttt{ioctl} call
-\item[5.] Use the device as usual, all accesses are now checked by the IOMMU
-\vspace{1em}
-\pause
-\item We have implemented this in our C driver, Rust is WIP
-\end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}{Why write a user space network driver?}
-\begin{itemize}
-\item Why not? It can be fun
-\item Maybe you need a quick \& dirty driver for a weird device?
-\item Maybe you need quick development cycles while playing around with a custom device
-\item Maybe you need some feature not supported by the original driver
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Example: Hardware timestamping}
-\begin{itemize}
-\item Our latency measurement requires timestamps with nanosecond-level precision
-\item It also needs to handle millions of packets per second (we measured with $\approx$ 15\,Mpps)
-\item This usually requires special hardware (we've used NetFPGAs to do this in the past)
-\pause
-\vspace{1em}
-\item Some cheap off-the-shelf NICs can add a timestamp to all  incoming packets
-\item But none of the existing drivers support this feature :(
-\pause
-\item We just set some flags in the right registers and got precise timestamping for cheap
-\item We used a Xeon D embedded NIC capturing all packets via a fiber optic splitter before and after our device under test (precision $\approx$ \textpm 15\,ns)
-\end{itemize}
-\end{frame}
+%\begin{frame}{Unprivileged user space drivers on Linux}
+%\begin{itemize}
+%\item[1.] Prepare the system as root
+%\begin{itemize}
+%\item[1.1.] Bind the device to the special \texttt{vfio} driver
+%\item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
+%\item[1.3.] Allow your user to lock some amount of memory via \texttt{ulimit}
+%\end{itemize}
+%\pause
+%\item[2.] \texttt{mmap} the special magic \texttt{vfio} device
+%\item[3.] Do some magic \texttt{ioctl} calls on the magic device
+%\item[4.] Protected DMA memory can also be allocated via an \texttt{ioctl} call
+%\item[5.] Use the device as usual, all accesses are now checked by the IOMMU
+%\vspace{1em}
+%\pause
+%\item We have implemented this in our C driver, Rust is WIP
+%\end{itemize}
+%\end{frame}
+%
+%
+%
+%
+%\begin{frame}{Why write a user space network driver?}
+%\begin{itemize}
+%\item Why not? It can be fun
+%\item Maybe you need a quick \& dirty driver for a weird device?
+%\item Maybe you need quick development cycles while playing around with a custom device
+%\item Maybe you need some feature not supported by the original driver
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}{Example: Hardware timestamping}
+%\begin{itemize}
+%\item Our latency measurement requires timestamps with nanosecond-level precision
+%\item It also needs to handle millions of packets per second (we measured with $\approx$ 15\,Mpps)
+%\item This usually requires special hardware (we've used NetFPGAs to do this in the past)
+%\pause
+%\vspace{1em}
+%\item Some cheap off-the-shelf NICs can add a timestamp to all  incoming packets
+%\item But none of the existing drivers support this feature :(
+%\pause
+%\item We just set some flags in the right registers and got precise timestamping for cheap
+%\item We used a Xeon D embedded NIC capturing all packets via a fiber optic splitter before and after our device under test (precision $\approx$ \textpm 15\,ns)
+%\end{itemize}
+%\end{frame}
 
 %\begin{frame}{(Maybe) network stack of the future}
 %\end{frame}
