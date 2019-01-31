@@ -1,4 +1,4 @@
-\documentclass[NET,english,aspectratio=169,notitleframe]{tumbeamer}
+\documentclass[NET,english,aspectratio=43,notitleframe]{tumbeamer}
 %settings
 \usepackage[utf8]{inputenc}
 \usepackage{pgfplotstable}
@@ -72,7 +72,7 @@
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
 \author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger,\\ Alexander Frank, Thomas Günzel, Stefan Huber, Alexandru Obada,\\ Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
 \title{Writing Network Drivers in High-Level Languages}
-\date{February 02, 2019}
+\date{February 2, 2019}
 
 \makeatletter
 \let\@@magyar@captionfix\relax
@@ -91,7 +91,7 @@
   \strut\textcolor{TUMBlue}{\inserttitle}%
   \\[4ex]%
   \normalsize%
-  \strut\insertauthor%
+\footnotesize  \strut\insertauthor%
   \\[2ex]%
   \footnotesize%
   \insertdate%
@@ -114,10 +114,10 @@
   \Large%
   \strut\textcolor{TUMBlue}{\inserttitle}%
   \\[4ex]%
-  \normalsize%
-  \strut{}\bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$,\\ Alexander Frank$^5$, Thomas Günzel$^6$, Stefan Huber$^7$, Alexandru Obada$^8$,\\ Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$, Sebastian Voit$^{11}$ \normalfont %
-  \\[2ex]%
   \footnotesize%
+  \strut{} \bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$,\\ Alexander Frank$^5$, Thomas Günzel$^6$, Stefan Huber$^7$, Alexandru Obada$^8$,\\ Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$, Sebastian Voit$^{11}$ \normalfont %
+  \\[2ex]%
+  \scriptsize%
   $^1$C, thesis advisor\hspace{1em}
   $^2$Rust\hspace{1em}
   $^3$OCaml\hspace{1em}
@@ -130,6 +130,7 @@
   $^{10}$C\#\hspace{1em}
   $^{11}$Go\hspace{1em}
   \\[4ex]%
+  \footnotesize
     \ifdefined\departmentname%
     \ifdefined\chairname%
       \chairname\\%
@@ -151,7 +152,7 @@
 \vfill
 \emph{Simon}
 \begin{itemize}
-\item Rust driver as bachelor's thesis, now HiWi/research assistant
+\item Rust driver as bachelor's thesis, now research assistant
 \end{itemize}
 \emph{Everyone else mentioned on the title slide}
 \begin{itemize}
@@ -177,9 +178,11 @@
 \item Attempt to write a simple yet fast user space network driver
 \item It's a user space driver you can easily understand and read
 \item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
-\item Supports Intel ixgbe NICs %(82599, X540, Xeon D, ...)
-\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
+\item Supports Intel ixgbe NICs and VirtIO %(82599, X540, Xeon D, ...)
+%\item New: supports VirtIO NICs (qemu/kvm and VirtualBox, we got a Vagrant setup!)
 \item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
+\vspace{1ex}
+\item But is C the best language for drivers?
 \end{itemize}
 \end{frame}
 
@@ -429,28 +432,28 @@
 %\end{frame}
 
 
-\begin{frame}{Handling packets via DMA}
-\begin{itemize}
-\item Packets are transferred via queue interfaces (often called rings)
-\item Rings are configured via MMIO and accessed by the device via DMA
-\item Rings (usually) contain pointers to packets, also accessed via DMA
-\pause
-\vspace{1em}
-\item Details vary between different devices
-\item This is not unique to NICs: most PCIe devices work in a similar manner
-\end{itemize}
-\end{frame}
+%\begin{frame}{Handling packets via DMA}
+%\begin{itemize}
+%\item Packets are transferred via queue interfaces (often called rings)
+%\item Rings are configured via MMIO and accessed by the device via DMA
+%\item Rings (usually) contain pointers to packets, also accessed via DMA
+%\pause
+%\vspace{1em}
+%\item Details vary between different devices
+%\item This is not unique to NICs: most PCIe devices work in a similar manner
+%\end{itemize}
+%\end{frame}
 
 
-\begin{frame}{Challenges for high-level languages}
-\begin{itemize}
-\item Access to \texttt{mmap} with the proper flags
-\item Handle externally allocated (foreign) memory in the language
-\item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
-\item Memory access semantics: memory barriers, volatile reads/writes
-\item Some operations in drivers are inherently unsafe
-\end{itemize}
-\end{frame}
+%\begin{frame}{Challenges for high-level languages}
+%\begin{itemize}
+%\item Access to \texttt{mmap} with the proper flags
+%\item Handle externally allocated (foreign) memory in the language
+%\item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
+%\item Memory access semantics: memory barriers, volatile reads/writes
+%\item Some operations in drivers are inherently unsafe
+%\end{itemize}
+%\end{frame}
 
 
 \begin{frame}{Goals for our implementations}
@@ -887,7 +890,7 @@ A safe, concurrent, practical systems language.
 \begin{frame}[fragile]{Safety in Rust: The ownership system by example}
 \begin{itemize}
 \item \texttt{Packet}s are owners of some DMA memory
-\item \texttt{Packet}s are passed between users and the driver, thus ownership is passed as well
+\item \texttt{Packet}s are passed between user code and the driver, thus ownership is passed as well
 \item At any point in time there is only one \texttt{Packet} owner that can change its memory
 \end{itemize}
 \begin{minted}{rust}
@@ -904,7 +907,7 @@ buffer.drain(..);
 \begin{frame}[fragile]{Safety in Rust: Unsafe code}
 \begin{itemize}
 \item Not everything can be done in safe Rust
-\item Calling foreign functions and dereferencing raw pointers is per se unsafe
+\item Calling foreign functions and dereferencing raw pointers is unsafe
 \item Many functions in Rust's standard library make use of unsafe code
 \end{itemize}
 \begin{minted}{rust}
@@ -917,7 +920,7 @@ let ptr = unsafe {
 \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Rust by example}
+\begin{frame}[fragile]{Example: Setting registers}
 \begin{itemize}
 \item Biggest challenge: safe memory handling with unsafe code
 \end{itemize}
@@ -929,7 +932,9 @@ fn set_reg32(&self, reg: u32, val: u32) {
   );
 
   unsafe {
-    ptr::write_volatile((self.addr as usize + reg as usize) as *mut u32, val);
+    ptr::write_volatile(
+        (self.addr as usize + reg as usize) as *mut u32, val
+    );
   }
 }
 \end{minted}
@@ -951,7 +956,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 %\end{frame}
 
 \begin{frame}{Batching at 3.3\,GHz CPU speed}
-\centering\includegraphics[scale=1.1]{figures/batches-33.pdf}
+\centering\includegraphics[scale=1]{figures/batches-33.pdf}
 \end{frame}
 
 %\setbeamertemplate{footline}{}
@@ -994,15 +999,15 @@ fn set_reg32(&self, reg: u32, val: u32) {
 %\centering\includestandalone[scale=0.8]{figures/latency-ccdf}
 %\end{frame}
 
-\begin{frame}{Tail latency}
+\begin{frame}{Tail latency at 1\,Mpps}
 \centering\includegraphics[scale=1.1]{figures/latency-1/latency-ccdf.pdf}
 \end{frame}
 
-\begin{frame}{Tail latency}
+\begin{frame}{Tail latency at 10\,Mpps}
 \centering\includegraphics[scale=1.1]{figures/latency-10/latency-ccdf.pdf}
 \end{frame}
 
-\begin{frame}{Tail latency}
+\begin{frame}{Tail latency at 20\,Mpps}
 \centering\includegraphics[scale=1.1]{figures/latency-20/latency-ccdf.pdf}
 \end{frame}
 
@@ -1023,27 +1028,27 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu1}
+\centering\includestandalone[scale=.70]{figures/iommu1}
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu2}
+\centering\includestandalone[scale=.70]{figures/iommu2}
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu3}
+\centering\includestandalone[scale=.70]{figures/iommu3}
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu4}
+\centering\includestandalone[scale=.70]{figures/iommu4}
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu5}
+\centering\includestandalone[scale=.70]{figures/iommu5}
 \end{frame}
 
 \begin{frame}{Memory access on modern systems}
-\centering\includestandalone[scale=.75]{figures/iommu6}
+\centering\includestandalone[scale=.70]{figures/iommu6}
 \end{frame}
 
 %\begin{frame}{Unprivileged user space drivers on Linux}
@@ -1099,7 +1104,7 @@ fn set_reg32(&self, reg: u32, val: u32) {
 \begin{frame}{Conclusion: Check out our code}
 \centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
 \begin{itemize}
-\item Meta-repository with links: \url{https://github.com/ixy-languages/ixy-languages}
+\item Meta-repository with links:\\\url{https://github.com/ixy-languages/ixy-languages}
 \item Drivers are simple: don't be afraid of them
 \item No kernel code needed :)
 \end{itemize}

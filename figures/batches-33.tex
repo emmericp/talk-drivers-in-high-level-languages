@@ -46,9 +46,11 @@
 	legend style={font=\fontsize{7}{8}\selectfont},
 %	tick label style={font=\fontsize{8}{9}\selectfont},
 %	label style={font=\fontsize{8}{9}\selectfont},
+	legend style={at={(1,0.5)},anchor=west},
 	every axis legend/.append style={nodes={right}},
 	legend entries={C, Rust, Go, C\#, OCaml, Swift, Haskell, Python},
-	legend pos = north west, legend columns=2
+	%legend pos = north west,
+	legend columns=1
 ]
 
 
@@ -96,16 +98,16 @@
 		(128,26.8)
 };
 \addplot [mark=diamond*,color=TUMYellow, thick]  coordinates {
-(1    ,   0.08 * 2)
-(2    ,   0.15 * 2)
-(4    ,   0.30 * 2)
-(8    ,   0.57 * 2)
-(16  ,    1.02 * 2)
-(32     , 1.71 * 2)
-(64    ,  2.59 * 2)
-(128 ,    3.91 * 2)
-(256,     4.61 * 2)
-(512,     3.88 * 2)
+(1    ,   1.63 * 2)
+(2    ,   2.54 * 2)
+(4    ,   4.00 * 2)
+(8    ,   4.69 * 2)
+(16  ,    5.49 * 2)
+(32     , 5.44 * 2)
+(64    ,  6.15 * 2)
+(128 ,    5.85 * 2)
+(256,     5.68 * 2)
+%(512,     3.88 * 2)
 };
 \addplot [mark=pentagon*,color=TUMPurple, thick]  coordinates {
 (1,1.7)

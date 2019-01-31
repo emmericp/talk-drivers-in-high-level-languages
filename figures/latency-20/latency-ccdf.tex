@@ -33,25 +33,23 @@
 \begin{axis}[
 	width=10cm,
 	height=6cm,
-	xmin=0, xmax=200,
-	ymin=0.0000007, ymax=1,
-	ymode=log,
+	x dir=reverse,
+	xmode=log,
+	xmin=0, xmax=1,
+	ymin=0, ymax=240,
 	grid=major,
-	ylabel={CCDF},
-	xlabel={Latency [$\mu$s]},
-%	legend style={font=\fontsize{8}{9}\selectfont},
-%	tick label style={font=\fontsize{8}{9}\selectfont},
-%	label style={font=\fontsize{8}{9}\selectfont},
-	ytick={1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001},
-	yticklabels={$10^0$,~,$10^{-2}$,~,$10^{-4}$,~,$10^{-6}$},
-	minor ytick={.9, .8, .7, .6, .5, .4, .3, .2, .09, .08, .07, .06, .05, .04, .03, .02, .009, .008, .007, .006, .005, .004, .003, .002, .0009, .0008, .0007, .0006, .0005, .0004, .0003, .0002, .00009, .00008, .00007, .00006, .00005, .00004, .00003, .00002, .000009, .000008, .000007, .000006, .000005, .000004, .000003, .000002},
+	xlabel={Percentile},
+	xtick={1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000002},
+	minor xtick={.9, .8, .7, .6, .5, .4, .3, .2, .09, .08, .07, .06, .05, .04, .03, .02, .009, .008, .007, .006, .005, .004, .003, .002, .0009, .0008, .0007, .0006, .0005, .0004, .0003, .0002, .00009, .00008, .00007, .00006, .00005, .00004, .00003, .00002, .000009, .000008, .000007, .000006, .000005, .000004, .000003, .000002},
+	xticklabels={0, 90, 99, 99.9, 99.99, 99.999, {}, Max},
+	ylabel={Latency [$\mu$s]},
 	every axis legend/.append style={nodes={right}},
 	legend entries={C, Rust, Go},
 	legend pos = north east
 ]
-\addplot [mark=none,color=TUMBlack, thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {c-cdf.csv};
-\addplot [mark=x,color=TUMDarkerBlue, thick,mark repeat*=19] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {rust-cdf.csv};
-\addplot [mark=triangle*,color=TUMGreen, thick,mark repeat*=29] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {go-cdf.csv};
+\addplot [mark=none,color=TUMBlack, thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {c-cdf.csv};
+\addplot [mark=none,color=TUMDarkerBlue, thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {rust-cdf.csv};
+\addplot [mark=none,color=TUMGreen, thick] table[col sep=comma,y=lat,x expr=1-\thisrow{cdf}] {go-cdf.csv};
 
 %\addplot [mark=diamond*,color=TUMYellow, thick,mark repeat*=4] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {ocaml-cdf.csv};
 %\addplot [mark=*,color=TUMLightRed, thick,mark repeat*=2] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {haskell-cdf.csv};
