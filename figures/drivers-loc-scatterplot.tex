@@ -1,0 +1,179 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{tumcolor}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+\begin{document}
+\pgfplotsset{
+    every non boxed x axis/.style={} 
+}
+\tikzset{every mark/.append style={scale=1.5}}
+
+
+
+\begin{tikzpicture}
+\begin{axis}[
+	ymode=log,
+	xmode=log,
+	width=10cm,
+	height=5cm,
+	xmin=5, xmax=200000,
+	ymin=100, ymax=191895,
+	grid=major,
+	xtick={10,100,1000,2500,10000,40000,100000},
+%	symbolic x coords={10M,100,1000,2500,10000,40000,100000},
+	xticklabels={10M,100M,1G,2.5G,10G,40G,100G},
+%	xtick=data,
+	ylabel={Lines of code},
+	xlabel={Max supported speed},
+%	ytick ={516, 520, 524},
+%	xtick={0, 20.16, 40.032, 60.48, 80.64, 100.86},
+%	legend style={font=\fontsize{8}{9}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={DPDK drivers~~, Linux drivers},
+	legend pos = north west, % east,% west,
+	legend columns=2,
+	scatter/classes={1={mark=+,TUMDarkerBlue},2={mark=x,TUMOrange}}
+]
+\addplot[scatter,only marks,scatter src=explicit symbolic,color=TUMDarkerBlue] table[meta=label,col sep=comma] {
+x,y,label
+10000,6882,1
+100000,22197,1
+100000,16026,1
+40000,6619,1
+40000,8748,1
+100000,8516,1
+100000,22763,1
+10000,5358,1
+100000,60095,1
+100000,61895,1
+10000,5260,1
+10000,6915,1
+10000,39709,1
+10000,2380,1
+1000,32651,1
+2500,966,1
+40000,50369,1
+10000,38778,1
+2500,1289,1
+};
+\addplot[scatter,only marks,scatter src=explicit symbolic,color=TUMOrange,mark=x] table[meta=label,col sep=comma] {
+x,y,label
+100,2880,apple
+1000,10105,realtek
+1000,18336,intel/igb
+100000,9841,intel/fm10k
+1000,11899,intel/e1000
+40000,12105,intel/ice
+40000,38839,intel/i40e
+10000,4103,intel/ixgb
+10000,30044,intel/ixgbe
+1000,18793,intel/e1000e
+100000,5805,synopsys
+100,1312,xircom
+10,1466,seeq
+1000,26258,sun
+1000,5648,natsemi
+100,1101,nxp
+1000,3448,dlink
+1000,3256,xilinx
+1000,2816,socionext
+100000,8054,huawei/hinic
+40000,7167,amazon/ena
+100,1971,sgi
+100,2354,hp
+1000,6211,atheros/atlx
+1000,3664,atheros/alx
+1000,4231,atheros/atl1c
+1000,3597,atheros/atl1e
+1000,2651,cortina
+10000,6896,apm
+100000,115198,qlogic
+10000,8088,marvell/mvpp2
+100,824,fujitsu
+1000,6119,qualcomm
+1000,2395,altera
+100,3269,sis
+10000,16929,brocade
+10,567,ezchip
+100000,51549,sfc
+1000,7508,toshiba
+100000,134652,broadcom
+100,9159,8390
+10000,4296,samsung/sxgbe
+1000,1289,aeroflex
+1000,1349,aurora
+40000,7185,cisco/enic
+1000,2459,mediatek
+10000,3397,myricom/myri10000e
+2500,4541,mscc
+100,906,rdc
+40000,33073,mellanox/mlx4
+100000,43480,mellanox/mlx5
+1000,2471,faraday
+10000,17067,ibm
+10000,13132,emulex
+10000,28657,amd
+100000,38178,chelsio/cxgb4
+10000,15399,chelsio/cxgb3
+10000,9533,chelsio/cxgb
+100,751,allwinner
+10000,5117,nvidia
+10000,1581,pasemi
+100,1481,microchip/enc28j60*
+1000,4736,microchip/lan743x*
+100,1563,microchip/encx24j600*
+1000,5121,via
+10000,23784,neterion
+100000,24790,netronome/nfp
+1000,31618,hisilicon
+100,838,nuvoton
+100,1911,wiznet
+100,14616,dec/tulip
+1000,2925,agere
+10000,1972,tehuti
+1000,1444,tundra
+1000,1238,xscale
+100,1157,silan
+1000,1179,cavium/octeon
+40000,17864,cavium/liquidio
+10000,8169,cavium/thunder
+100,8684,micrel
+1000,17895,stmicro/stmmac
+100,4669,i825xx
+100,1140,arc
+1000,1900,alacritech
+1000,11637,smsc
+1000,3272,oki-semi
+1000,4651,cadence
+10,2772,cirrus
+1000,6028,renesas
+1000,2689,alteon
+100,8582,3com
+10000,7756,aquantia
+100,1536,adaptec
+10,708,moxa
+1000,2260,packetengines
+1000,16601,ti
+100,1337,davicom
+100,820,korina.c
+1000,2584,jme.c
+1000,967,jme.h
+100,377,netx-eth.c
+100,1412,fealnx.c
+1000,977,ethoc.c
+1000,628,dnet.c
+1000,160,dnet.h
+};
+% 0.3624x+5781.4 r^2=0.3613
+\addplot+[color=TUMBlack,mark=none,domain=5:200000,thick]  { 0.3624 * x + 5781.4 };
+\node[anchor=west] at (axis cs: 5.5,8000) {\fontsize{8}{9}\selectfont $0.3624x + 5781$};
+\end{axis}
+\end{tikzpicture}
+\end{document}
