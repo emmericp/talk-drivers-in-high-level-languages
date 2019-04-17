@@ -1,0 +1,106 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{../tumcolor}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{grid style={dotted}}
+\usetikzlibrary{plotmarks}
+
+\pgfplotsset{
+    mark repeat*/.style={
+        scatter,
+        scatter src=x,
+        scatter/@pre marker code/.code={
+            \pgfmathtruncatemacro\usemark{
+                (\coordindex==(\numcoords-#1)
+            }
+            \ifnum\usemark=0
+                \pgfplotsset{mark=none}
+            \fi
+        },
+        scatter/@post marker code/.code={}
+    }
+}
+
+\begin{document}
+%\pgfplotsset{
+%    every non boxed x axis/.style={} 
+%}
+\tikzset{every mark/.append style={scale=1}}
+\begin{tikzpicture}
+\begin{axis}[
+	width=10cm,
+	height=6cm,
+	xmode=log,
+	log basis x={2},
+	log ticks with fixed point,
+	xmin=0.75, xmax=384,
+	ymin=0, ymax=16,
+	grid=major,
+	xtick={1, 2, 4, 8, 16, 32, 64, 128, 256},
+	ytick={0,5,10,15,20},
+	ylabel=Throughput {[}Gbit/s{]},
+	xlabel={Batch size},
+	legend style={font=\fontsize{7}{8}\selectfont},
+%	tick label style={font=\fontsize{8}{9}\selectfont},
+%	label style={font=\fontsize{8}{9}\selectfont},
+	every axis legend/.append style={nodes={right}},
+	legend entries={No IOMMU{,} 4\,KiB or 2\,MiB pages, With IOMMU{,} 2\,MiB pages, With IOMMU{,} 4\,KiB pages},
+	legend style={at={(0.985,0.025)},anchor=south east},
+	legend columns=1
+]
+
+
+\addplot [mark=none,color=TUMBlack, thick] coordinates { % ixy
+	(1,3.530)
+	(2,5.870)
+	(4,8.448)
+	(8,10.984)
+	(16,13.457)
+	(32,14.398)
+	(64,14.808)
+	(128,14.930)
+	(256,14.894)
+};
+
+
+\addplot [mark=triangle*,color=TUMOrange, thick] coordinates { % ixy_iommu 2m
+	(1,3.222)
+	(2,5.402)
+	(4,8.338)
+	(8,10.876)
+	(16,13.342)
+	(32,14.138)
+	(64,14.772)
+	(128,14.451)
+	(256,14.896)
+};
+
+
+\addplot [mark=*,color=TUMBlue, thick] coordinates { % ixy_iommu 4k
+	(  1,  3.14)
+	(  2,  5.64)
+	(  4,  9.04)
+	(  8, 10.76)
+	( 16, 8.64)
+	( 32, 8.64)
+	( 64, 8.6)
+	(128, 8.58)
+	(256, 8.5)
+};
+
+
+%\addplot[mark=none,color=black!60,forget plot,thick] coordinates {
+%(0.75,9.058)
+%(384,9.058)
+%};
+%\addplot[mark=none,color=black!60,forget plot,thick] coordinates {
+%(0.75,4.7)
+%(384,4.7)
+%};
+%\node[anchor = south,yshift=-0.2em] at (axis cs: 100,0.01) { 99th percentile};
+\end{axis}
+\end{tikzpicture}
+\end{document}

@@ -76,9 +76,10 @@
 
 % For beamer mode (default):
  % jeder von dem wir hier irgendwas nehmen, alphabetisch sortiert
-\author[Paul Emmerich]{\textbf{Paul Emmerich}, Simon Ellmann, Georg Carle}
-\title{Safe and Secure User Space Drivers}
-\date{February 28, 2019}
+\author[Paul Emmerich, Simon Ellmann]{\textbf{Paul Emmerich}, \textbf{Simon Ellmann}, Fabian Bonk, Alex Egger,\\ Alexander Frank, Thomas Günzel, Stefan Huber, Alexandru Obada,\\ Maximilian Pudelko, Maximilian Stadlmeier, Sebastian Voit}
+%\title{Treiber in High-Level Programmiersprachen}
+\title{Drivers in High-Level Languages}
+\date{21. April 2019}
 
 \makeatletter
 \let\@@magyar@captionfix\relax
@@ -110,78 +111,118 @@
   \fi%
   \TUMname\\%
 \end{frame}
-\setbeamertemplate{footline}[tumfootline]
+
+  \begin{frame}[c,noframenumbering]
+%    \begin{tikzpicture}[overlay,remember picture]
+%      \node[opacity=0.5,anchor=south east] at ($(current page.south east)+(-1,-1)$) {%
+%    \includegraphics[width=.4\textwidth]{pics/TUM_Uhrenturm.png}};
+%  \end{tikzpicture}
+  \centering%
+  \Large%
+  \strut\textcolor{TUMBlue}{\inserttitle}%
+  \\[4ex]%
+  \footnotesize%
+  \strut{} \bfseries Paul Emmerich$^1$, Simon Ellmann$^2$, Fabian Bonk$^3$, Alex Egger$^4$,\\ Alexander Frank$^5$, Thomas Günzel$^6$, Stefan Huber$^7$, Alexandru Obada$^8$,\\ Maximilian Pudelko$^9$, Maximilian Stadlmeier$^{10}$, Sebastian Voit$^{11}$ \normalfont %
+  \\[2ex]%
+  \scriptsize%
+  $^1$C, Thesis advisor\hspace{1em}
+  $^2$Rust\hspace{1em}
+  $^3$OCaml\hspace{1em}
+  $^4$Haskell\hspace{1em}
+  $^5$Latency measurement setup\hspace{1em}\\
+  $^6$Swift\hspace{1em}
+  $^7$IOMMU\hspace{1em}
+  $^8$Python\hspace{1em}
+  $^9$VirtIO Treiber\hspace{1em}
+  $^{10}$C\#\hspace{1em}
+  $^{11}$Go\hspace{1em}
+  \\[4ex]%
+  \footnotesize
+    \ifdefined\departmentname%
+    \ifdefined\chairname%
+      \chairname\\%
+    \fi%
+    \departmentname\\%
+  \fi%
+  \TUMname\\%
+\end{frame}\setbeamertemplate{footline}[tumfootline]
 
 
-\begin{frame}{Network drivers}
-\centering\includegraphics[width=0.60\textwidth]{pics/nic3}\\
-\vspace{-1em}\tiny{Intel XL710 [Picture: Intel.com]}
-\end{frame}
-
-\begin{frame}{Network driver complexity is increasing}
-\centering\includegraphics[scale=1.1]{figures/drivers-loc-scatterplot}
-\end{frame}
-
-
-\begin{frame}{The ixy driver}
+\begin{frame}{About us}
+\begin{columns}
+\begin{column}{0.8\textwidth}
+\emph{Paul}
 \begin{itemize}
-\item Our attempt to write a simple yet fast user space network driver
-\item It's a user space driver you can easily understand and read
-\item Supports Intel ixgbe NICs (82599, X540, Xeon D, ...) and VirtIO 
-\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
-\item Intel driver: 38,000 lines in DPDK, 30,000 in Linux
-\item Small code size makes it ideal for trustworthy systems
-%\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
-\vspace{1ex}
-\item But is C the best language for drivers?
+\item PhD student at Technical University of Munich
+\item Researching software packet processing performance
+\end{itemize}
+\vspace{1em}
+\emph{Simon}
+\begin{itemize}
+\item Rust driver as bachelor's thesis, now research assistant (HiWi)
+\end{itemize}
+\vspace{1em}
+\emph{Everyone else mentioned on the title slide}
+\begin{itemize}
+\item Did a thesis with Paul as advisor
+\end{itemize}
+\end{column}
+\begin{column}{0.2\textwidth}
+\includegraphics[width=0.9\textwidth]{pics/paul.jpg}\\
+\includegraphics[width=0.9\textwidth]{pics/simon.jpg}\\
+%\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{C is an awesome language for operating systems!}
+\begin{itemize}
+\item Low-level access to memory and devices
+\item Pointers are awesome
+\item You can write safe and secure code if you try really hard
+\item Everyone can read and write C
+\item C code can be beautiful
 \end{itemize}
 \end{frame}
 
-%\begin{frame}{Expectation: Beautiful C code}
-%\begin{itemize}
-%\item Why write a driver in C?
-%\pause
-%\vspace{1em}
-%\item Most drivers are written in C
-%\item C is the lowest common denominator of systems programming languages
-%\item C code can be beautiful
-%\item Everyone can read C?
-%\end{itemize}
-%\end{frame}
-%
-%\begin{frame}[fragile]{Reality: C can be ugly}
-%\begin{minted}[autogobble]{c}
-%#define mystery_macro(ptr, type, member) ({\
-%	const typeof(((type*)0)->member)* __mptr = (ptr);\
-%	(type*)((char*)__mptr - offsetof(type, member));\
-%})
-%\end{minted}
-%\end{frame}
-%
-%\begin{frame}[fragile]{Reality: C can be ugly}
-%\begin{minted}[autogobble]{c}
-%#define container_of(ptr, type, member) ({\
-%	const typeof(((type*)0)->member)* __mptr = (ptr);\
-%	(type*)((char*)__mptr - offsetof(type, member));\
-%})
-%\end{minted}
-%\end{frame}
-%
-%
-%\begin{frame}[fragile]{Reality: C can be ugly}
-%\begin{minted}[autogobble]{c}
-%#define container_of(ptr, type, member) ({\
-%	const typeof(((type*)0)->member)* __mptr = (ptr);\
-%	(type*)((char*)__mptr - offsetof(type, member));\
-%})
-%\end{minted}
-%\begin{itemize}
-%\item Allows some ``inheritance'' in C to abstract driver implementations
-%\item Virtually all C drivers use this macro
-%\item The Linux kernel contains $\approx$ 15,000 uses of this macro
-%\end{itemize}
-%\end{frame}
-%
+
+
+
+\begin{frame}[fragile]{Beautiful C code}
+\begin{minted}[autogobble]{c}
+#define mystery_macro(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Beautiful C code}
+\begin{minted}[autogobble]{c}
+#define container_of(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\end{frame}
+
+
+\begin{frame}[fragile]{Beautiful C code}
+\begin{minted}[autogobble]{c}
+#define container_of(ptr, type, member) ({\
+	const typeof(((type*)0)->member)* __mptr = (ptr);\
+	(type*)((char*)__mptr - offsetof(type, member));\
+})
+\end{minted}
+\begin{itemize}
+\item Allows some ``inheritance'' in C to abstract driver implementations
+\item Virtually all C drivers use this macro
+\item The Linux kernel contains $\approx$ 15,000 uses of this macro
+\end{itemize}
+\end{frame}
+
 \begin{frame}{C can cause security problems}
 \centering\includegraphics[trim={0 13cm 0 0},clip,width=0.65\textwidth]{pics/cve}
 
@@ -207,7 +248,7 @@
 \centering
 \begin{tabular}{ l  r r l }
   \toprule
-  Bug type & Num. & Perc. & Can be avoided by a high-level language? \\
+  Bug type & Num. & Perc. & Can be avoided by using a better language? \\
   \midrule
   Various & 11 & 17\% & Unclear/Maybe \\
   Logic & 14 & 22\% & No \\
@@ -217,20 +258,44 @@
 \end{tabular}
 \caption{Code execution vulnerabilities in the Linux kernel identified by Cutler et al$^1$}
 \end{table}
-
 \end{frame}
 
-\begin{frame}{Are there preventable bugs in drivers?}
+
+\begin{frame}{Let's rewrite all operating systems in better languages?}
 \begin{itemize}
-\item We looked at these 40 preventable bugs
+\item Rewriting the whole operating system in a safer language is a laudable effort
+\begin{itemize}
+\item Redox (Rust) wants to become a production-grade OS but currently isn't
+\item Singularity (Sing\#, Microsoft Research) demonstrated some interesting concepts
+\item Biscuit (Go) implements parts of POSIX for research
+\item Unikernels like MirageOS (OCaml) or IncludeOS (C++) can be useful in some scenarios
+\end{itemize}
 \pause
-\item 39 of them were in drivers (the other was in the Bluetooth stack)
+\item But none of these will replace your main operating system any time soon
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Should drivers for trustworthy systems be written in C?}
+
+\begin{frame}{Where are these bugs that could have been prevented?}
 \begin{itemize}
-\item If you have a choice: probably not
+\item We looked at these 40 preventable bugs
+%\pause
+\item 39 of them were in drivers (the other was in the Bluetooth stack)
+\pause
+\item 13 were in the Qualcomm WiFi driver
+\end{itemize}
+\pause
+\centering\includegraphics[height=0.5\textheight]{pics/surprised_pikachu}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Can we rewrite drivers in better languages?}
+\begin{itemize}
+\item Some operating systems have drivers in (subsets of) C++
+\item But good luck getting a driver in Rust or Go upstreamed in Linux
 \pause
 \item User space drivers can be written in \emph{any} language!
 \item But are all languages an equally good choice?
@@ -238,172 +303,210 @@
 \end{itemize}
 \end{frame}
 
-%\setbeamertemplate{footline}{}
-%\setbeamertemplate{headline}{}
-%\begin{frame}{}
-%\centering\includegraphics[width=0.65\textwidth]{pics/allthe1}
-%\end{frame}
 
-%\begin{frame}{}
-%\centering\includegraphics[width=0.65\textwidth]{pics/allthe2}
-%\end{frame}
+\begin{frame}{Network drivers}
+\centering\includegraphics[width=0.60\textwidth]{pics/nic3}\\
+\vspace{-1em}\tiny{Intel XL710 [Picture: Intel.com]}
+\end{frame}
 
-%\begin{frame}{}
-%\centering\includegraphics[width=0.85\textwidth]{pics/theses}
-%\end{frame}
-%\setbeamertemplate{headline}[tumheadline]
-%\setbeamertemplate{footline}[tumfootline]
-
-
-%\begin{frame}{Basics: How to talk to (modern) PCIe devices}
-%\begin{enumerate}
-%\item Memory-mapped IO (MMIO)
-%\item Direct memory access (DMA)
-%\item Interrupts
-%\end{enumerate}
-%\end{frame}
-
-%\begin{frame}{Basics: How to talk to (modern) PCIe devices}
-%\begin{enumerate}
-%\item Memory-mapped IO (MMIO)
-%\begin{itemize}
-%\item Magic memory area that is mapped to the device
-%\item Memory reads/writes are directly forwarded to the device
-%\item Usually used to expose device registers
-%\item User space drivers: \texttt{mmap} a magic file
-%\end{itemize}
-%\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
-%\item[\color{TUMLightGray}3.] {\color{TUMLightGray} Interrupts}
-%\end{enumerate}
-%\end{frame}
-
-%\begin{frame}{Basics: How to talk to (modern) PCIe devices}
-%\begin{enumerate}
-%\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
-%\item[2.] Direct memory access (DMA)
-%\begin{itemize}
-%\item Allows the device to read/write \emph{arbitrary} memory locations
-%\item User space drivers: figure out physical addresses, tell the device to write there
-%\end{itemize}
-%\item[\color{TUMLightGray}3.] {\color{TUMLightGray}  Interrupts}
-%\end{enumerate}
-%\end{frame}
-
-%\begin{frame}{Basics: How to talk to (modern) PCIe devices}
-%\begin{enumerate}
-%\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
-%\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
-%\item[3.] Interrupts
-%\begin{itemize}
-%\item This is how the device informs you about events
-%\item User space drivers: available via the Linux \texttt{vfio} subsystem
-%\item (Usually) not useful for high-speed network drivers 
-%\item We'll ignore interrupts here
-%\end{itemize}
-%\end{enumerate}
-%\end{frame}
+\begin{frame}{Why look at network drivers?}
+\begin{itemize}
+\item We happen to know a lot about networks ;)
+\item Easy to benchmark to quantify results
+\item Huge attack surface: exposed to the external world by design
+\item User space network drivers are already quite common (e.g., DPDK, Snabb)
+\item Network stacks are also moving into the user space (e.g., TCP stack on iOS)
+\pause
+\item Everything mentioned here is applicable to other drivers as well
+\end{itemize}
+\end{frame}
 
 
-%\begin{frame}{How to write a user space driver in 4 simple steps}
-%\begin{itemize}
-%\item[1.] Unload kernel driver
-%\item[2.] \texttt{mmap} the PCIe MMIO address space
-%\item[3.] Figure out physical addresses for DMA
-%\item[4.] Write the driver
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Network driver complexity is increasing}
+\centering\includegraphics[scale=1.1]{figures/drivers-loc-scatterplot}
+\end{frame}
 
-%\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
-%\begin{itemize}
-%\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
-%\item Commonly found in servers or as on-board chips
-%\item Very good datasheet publicly available
-%\vspace{1em}
-%\item Almost no logic hidden behind black-box firmware
-%%\item<2-> Black-box firmware contains almost no magic
-%\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
-%\item<2-> Here: all hardware features directly exposed to the driver
-%\end{itemize}
-%\end{frame}
+
+\begin{frame}{The ixy driver}
+\begin{itemize}
+\item Our attempt to write a simple yet fast user space network driver
+\item It's a user space driver you can easily understand and read
+\item Supports Intel ixgbe NICs (82599, X540, Xeon D, ...) and VirtIO 
+\item $\approx$ 1,000 lines of C code, full of references to datasheets and specs
+\item Intel driver: 38,000 lines in DPDK, 30,000 in Linux
+\item See talk ``Demystifying Network Cards'' at 34C3 for details
+%\item Check it out on GitHub: \url{https://github.com/emmericp/ixy}
+\vspace{1ex}
+\item But it's written in C, so let's rewrite that in a better and safer language
+\end{itemize}
+\end{frame}
+
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+\begin{frame}{}
+\centering\includegraphics[width=0.65\textwidth]{pics/allthe1}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.65\textwidth]{pics/allthe2}
+\end{frame}
+
+\begin{frame}{}
+\centering\includegraphics[width=0.85\textwidth]{pics/theses}
+\end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
+
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item Memory-mapped IO (MMIO)
+\item Direct memory access (DMA)
+\item Interrupts
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item Memory-mapped IO (MMIO)
+\begin{itemize}
+\item Magic memory area that is mapped to the device
+\item Memory reads/writes are directly forwarded to the device
+\item Usually used to expose device registers
+\item User space drivers: \texttt{mmap} a magic file
+\end{itemize}
+\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
+\item[\color{TUMLightGray}3.] {\color{TUMLightGray} Interrupts}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
+\item[2.] Direct memory access (DMA)
+\begin{itemize}
+\item Allows the device to read/write \emph{arbitrary} memory locations
+\item User space drivers: figure out physical addresses, tell the device to write there
+\end{itemize}
+\item[\color{TUMLightGray}3.] {\color{TUMLightGray}  Interrupts}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Basics: How to talk to (modern) PCIe devices}
+\begin{enumerate}
+\item[\color{TUMLightGray}1.] {\color{TUMLightGray} Memory-mapped IO (MMIO)}
+\item[\color{TUMLightGray}2.] {\color{TUMLightGray} Direct memory access (DMA)}
+\item[3.] Interrupts
+\begin{itemize}
+\item This is how the device informs you about events
+\item User space drivers: available via the Linux \texttt{vfio} subsystem
+\item (Usually) not useful for high-speed network drivers 
+\item We'll ignore interrupts here (implementation is WIP)
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{How to write a user space driver in 4 simple steps}
+\begin{itemize}
+\item[1.] Unload kernel driver
+\item[2.] \texttt{mmap} the PCIe MMIO address space
+\item[3.] Figure out physical addresses for DMA
+\item[4.] Write the driver
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hardware: Intel \texttt{ixgbe} family (10\,Gbit/s)}
+\begin{itemize}
+\item \texttt{ixgbe} family: 82599ES (aka X520), X540, X550, Xeon D embedded NIC
+\item Commonly found in servers or as on-board chips
+\item Very good datasheet publicly available
+\vspace{1em}
+\item Almost no logic hidden behind black-box firmware
+\item<2-> Black-box firmware contains almost no magic
+\item<2-> Drivers for many newer NICs often just exchanges messages with the firmware
+\item<2-> Here: all hardware features directly exposed to the driver
+\end{itemize}
+\end{frame}
 
 
 
 \newmintinline[ccode]{c}{}
 \newmintinline[bashcode]{c}{}
 
-%\begin{frame}[fragile=singleslide]{Find the device we want to use}
-%\begin{Verbatim}[commandchars=\\\{\}]
-%# lspci
-%03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-%03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-%\end{Verbatim}
-%\end{frame}
-%
-%\begin{frame}[fragile=singleslide]{Find the device we want to use}
-%\begin{Verbatim}[commandchars=\\\{\}]
-%# lspci
-%\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-%\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
-%\end{Verbatim}
-%\end{frame}
-%
-%\begin{frame}[fragile=singleslide]{Unload the kernel driver}
-%\begin{minted}{bash}
-%echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
-%\end{minted}
-%\end{frame}
-%
-%\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe register address space from user space}
-%\begin{minted}[autogobble]{c}
-%int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
-%struct stat stat;
-%fstat(fd, &stat);
-%uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
-%                                     MAP_SHARED, fd, 0);
-%\end{minted}
-%\end{frame}
-%
-%\begin{frame}{Device registers}
-%\centering\includegraphics[width=0.75\textwidth]{pics/registers}
-%\end{frame}
-%
-%\begin{frame}[fragile=singleslide]{Access registers: LEDs}
-%\begin{minted}[autogobble]{c}
-%#define LEDCTL 0x00200
-%#define LED0_BLINK_OFFS 7
-%
-%uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
-%*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
-%\end{minted}
-%\begin{itemize}
-%\item Memory-mapped IO: all memory accesses go directly to the NIC
-%\item One of the very few valid uses of \ccode{volatile} in C
-%\end{itemize}
-%\end{frame}
+\begin{frame}[fragile=singleslide]{Find the device we want to use}
+\begin{Verbatim}[commandchars=\\\{\}]
+# lspci
+03:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+03:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\end{Verbatim}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Find the device we want to use}
+\begin{Verbatim}[commandchars=\\\{\}]
+# lspci
+\textbf{03:00.0} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\textbf{03:00.1} Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ ...
+\end{Verbatim}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Unload the kernel driver}
+\begin{minted}{bash}
+echo 0000:03:00.1 > /sys/bus/pci/devices/0000:03:00.1/driver/unbind
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\texttt{mmap} the PCIe register address space from user space}
+\begin{minted}[autogobble]{c}
+int fd = open("/sys/bus/pci/devices/0000:03:00.0/resource0", O_RDWR);
+struct stat stat;
+fstat(fd, &stat);
+uint8_t* registers = (uint8_t*) mmap(NULL, stat.st_size, PROT_READ | PROT_WRITE,
+                                     MAP_SHARED, fd, 0);
+\end{minted}
+\end{frame}
+
+\begin{frame}{Device registers}
+\centering\includegraphics[width=0.75\textwidth]{pics/registers}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{Access registers: LEDs}
+\begin{minted}[autogobble]{c}
+#define LEDCTL 0x00200
+#define LED0_BLINK_OFFS 7
+
+uint32_t leds = *((volatile uint32_t*)(registers + LEDCTL));
+*((volatile uint32_t*)(registers + LEDCTL)) = leds | (1 << LED0_BLINK_OFFS);
+\end{minted}
+\begin{itemize}
+\item Memory-mapped IO: all memory accesses go directly to the NIC
+\item One of the very few valid uses of \ccode{volatile} in C
+\end{itemize}
+\end{frame}
 
 
-%\begin{frame}{Handling packets via DMA}
-%\begin{itemize}
-%\item Packets are transferred via queue interfaces (often called rings)
-%\item Rings are configured via MMIO and accessed by the device via DMA
-%\item Rings (usually) contain pointers to packets, also accessed via DMA
-%\pause
-%\vspace{1em}
-%\item Details vary between different devices
-%\item This is not unique to NICs: most PCIe devices work in a similar manner
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Handling packets via DMA}
+\begin{itemize}
+\item Packets are transferred via queue interfaces (often called rings)
+\item Rings are configured via MMIO and accessed by the device via DMA
+\item Rings (usually) contain pointers to packets, also accessed via DMA
+\pause
+\vspace{1em}
+\item Details vary between different devices
+\item This is not unique to NICs: most PCIe devices work in a similar manner
+\end{itemize}
+\end{frame}
 
 
-%\begin{frame}{Challenges for high-level languages}
-%\begin{itemize}
-%\item Access to \texttt{mmap} with the proper flags
-%\item Handle externally allocated (foreign) memory in the language
-%\item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
-%\item Memory access semantics: memory barriers, volatile reads/writes
-%\item Some operations in drivers are inherently unsafe
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Challenges for high-level languages}
+\begin{itemize}
+\item Access to \texttt{mmap} with the proper flags
+\item Handle externally allocated (foreign) memory in the language
+\item Handle memory layouts/formats (i.e., access memory that looks like a given C struct)
+\item Memory access semantics: memory barriers, volatile reads/writes
+\item Some operations in drivers are inherently unsafe
+\end{itemize}
+\end{frame}
 
 
 
@@ -459,8 +562,8 @@
 \item Write idiomatic code for the selected language
 \item Use language safety features where possible
 \item Quantify trade-offs for performance vs. safety
-\vspace{1em}
-\item This allows us to compare different languages for safety-critical systems
+%\vspace{1em}
+%\item This allows us to compare different languages %for safety-critical systems
 \end{itemize}
 \end{frame}
 
@@ -473,6 +576,7 @@
 	\begin{tabular}{lrrrr}
 		\textbf{Language} & \textbf{Main paradigm} & \textbf{Memory management} & \textbf{Compilation} \\
 		\toprule
+		C & Imperative & No & Compiled \\
 		Rust & Imperative & Ownership/RAII & (LLVM) Compiled \\
 		Go & Imperative & Garbage collection & Compiled \\
 		C\# & Object-oriented & Garbage collection & JIT \\
@@ -486,6 +590,33 @@
 	\label{tbl:languages}
 \end{table}
 \end{frame}
+
+\setbeamertemplate{footline}{}
+\begin{frame}{Language comparison: Safety properties}
+\begin{table}[t]
+ \setlength{\tabcolsep}{1.3mm}
+	\centering
+	\footnotesize
+	\begin{tabular}{lccccc}
+		& \multicolumn{2}{c}{\textbf{General memory}} & \multicolumn{2}{c}{\hspace{-1em}\textbf{Packet buffers}}  \\
+		\textbf{Language} & \textbf{Bounds checks} & \textbf{Use after free}  & \textbf{Bounds checks} & \textbf{Use after free} & \textbf{Int overflows} \\
+		\toprule
+		C & \xmark & \xmark & \xmark & \xmark & \xmark \\
+		Rust & &  &  &  &  \\
+		Go  & &  &  &  &  \\
+		C\#  & &  &  &  &  \\
+		Swift  & &  &  &  &  \\
+		Haskell  & &  &  &  &  \\
+		OCaml  & &  &  &  &  \\
+		Python  & &  &  &  &  \\
+		\bottomrule
+	\end{tabular}
+	\caption{Language-level protections against classes of bugs in our drivers}
+	\label{tbl:lang-safety}
+	\vspace{-3em}
+\end{table}
+\end{frame}
+\setbeamertemplate{footline}[tumfootline]
 
 \setbeamertemplate{footline}{}
 \begin{frame}{Language comparison: Safety properties}
@@ -521,13 +652,14 @@
 \setbeamertemplate{footline}[tumfootline]
 
 
+
 \begin{frame}{Language comparison: Implementation sizes}
 \begin{table}[t]
  \setlength{\tabcolsep}{2mm}
 	\centering
 	\footnotesize
 	\begin{tabular}{lrrr}
-		\textbf{Lang.} & \textbf{Lines of code}$^1$ & \textbf{Lines of C code}$^1$  & \textbf{Code size (gzip$^2$)} \\
+		\textbf{Lang.} & \textbf{Lines of code}$^1$ & \textbf{Lines of C code}$^1$  & \textbf{Source size (gzip$^2$)} \\
 		\toprule
 		C & 831 & 831 & 12.9\,kB  \\
 		Rust & 961 & 0 & 10.4\,kB\\
@@ -543,7 +675,7 @@
 	\item $^1$ Excluding empty lines and comments, counted with \texttt{cloc}
 	\item $^2$ Compression level 6
 	\end{tablenotes}
-	\caption{Size of our implementations (w/o register offset constants, stripped features not found in all drivers)}
+	\caption{Size of our implementations (w/o register constants, stripped features not found in all drivers)}
 	\label{tbl:lang-lines}
 	\vspace{-3em}
 \end{table}
@@ -890,96 +1022,96 @@
 %\end{itemize}
 %\end{frame}
 
-%\setbeamertemplate{footline}{}
-%\setbeamertemplate{headline}{}
-%\begin{frame}{}
-%\centering\includegraphics[height=0.87\textheight]{pics/rust}
-%\end{frame}
-%\setbeamertemplate{headline}[tumheadline]
-%\setbeamertemplate{footline}[tumfootline]
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+\begin{frame}{}
+\centering\includegraphics[height=0.87\textheight]{pics/rust}
+\end{frame}
+\setbeamertemplate{headline}[tumheadline]
+\setbeamertemplate{footline}[tumfootline]
 
-%\begin{frame}{Rust}
-%\emph{What is Rust?}\\
-%\begin{quote}
-%A safe, concurrent, practical systems language.
-%\end{quote}\\
-%\begin{itemize}
-%\item No garbage collector
-%\item Unique ownership system and rules for moving/borrowing values
-%\item Unsafe mode
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Rust}
+\emph{What is Rust?}\\
+\begin{quote}
+A safe, concurrent, practical systems language.
+\end{quote}\\
+\begin{itemize}
+\item No garbage collector
+\item Unique ownership system and rules for moving/borrowing values
+\item Unsafe mode
+\end{itemize}
+\end{frame}
 
-%\begin{frame}{Safety in Rust: The ownership system}
-%\begin{itemize}
-%\item Immutability of variables by default
-%\item Three rules:
-%\begin{enumerate}
-%\item Each value has a variable that is its owner
-%\item There can only be one owner at a time
-%\item When the owner goes out of scope, the value is freed
-%\end{enumerate}
-%\item Rules enforced at compile-time
-%\item Ownership can be passed to another variable% by
-%\begin{itemize}
-%\item ``moving'' the value or by
-%\item ``borrowing'' it through a reference
-%\end{itemize}
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Safety in Rust: The ownership system}
+\begin{itemize}
+\item Immutability of variables by default
+\item Three rules:
+\begin{enumerate}
+\item Each value has a variable that is its owner
+\item There can only be one owner at a time
+\item When the owner goes out of scope, the value is freed
+\end{enumerate}
+\item Rules enforced at compile-time
+\item Ownership can be passed to another variable% by
+\begin{itemize}
+\item ``moving'' the value or by
+\item ``borrowing'' it through a reference
+\end{itemize}
+\end{itemize}
+\end{frame}
 
-%\begin{frame}[fragile]{Safety in Rust: The ownership system by example}
-%\begin{itemize}
-%\item \texttt{Packet}s are owners of some DMA memory
-%\item \texttt{Packet}s are passed between user code and the driver, thus ownership is passed as well
-%\item At any point in time there is only one \texttt{Packet} owner that can change its memory
-%\end{itemize}
-%\begin{minted}{rust}
-%let buffer: &mut VecDeque<Packet> = VecDeque::new();
-%dev.rx_batch(RX_QUEUE, buffer, BATCH_SIZE);
-%for p in buffer.iter_mut() {
-%  p[48] += 1;
-%}
-%dev.tx_batch(TX_QUEUE, buffer);
-%buffer.drain(..);
-%\end{minted}
-%\end{frame}
+\begin{frame}[fragile]{Safety in Rust: The ownership system by example}
+\begin{itemize}
+\item \texttt{Packet}s are owners of some DMA memory
+\item \texttt{Packet}s are passed between user code and the driver, thus ownership is passed as well
+\item At any point in time there is only one \texttt{Packet} owner that can change its memory
+\end{itemize}
+\begin{minted}{rust}
+let buffer: &mut VecDeque<Packet> = VecDeque::new();
+dev.rx_batch(RX_QUEUE, buffer, BATCH_SIZE);
+for p in buffer.iter_mut() {
+  p[48] += 1;
+}
+dev.tx_batch(TX_QUEUE, buffer);
+buffer.drain(..);
+\end{minted}
+\end{frame}
 
-%\begin{frame}[fragile]{Safety in Rust: Unsafe code}
-%\begin{itemize}
-%\item Not everything can be done in safe Rust
-%\item Calling foreign functions and dereferencing raw pointers is unsafe
-%\item Many functions in Rust's standard library make use of unsafe code
-%\end{itemize}
-%\begin{minted}{rust}
-%let ptr = unsafe {
-%  libc::mmap(
-%    ptr::null_mut(), len, libc::PROT_READ | libc::PROT_WRITE,
-%    libc::MAP_SHARED, file.as_raw_fd(), 0,
-%  ) as *mut u8
-%};
-%\end{minted}
-%\end{frame}
+\begin{frame}[fragile]{Safety in Rust: Unsafe code}
+\begin{itemize}
+\item Not everything can be done in safe Rust
+\item Calling foreign functions and dereferencing raw pointers is unsafe
+\item Many functions in Rust's standard library make use of unsafe code
+\end{itemize}
+\begin{minted}{rust}
+let ptr = unsafe {
+  libc::mmap(
+    ptr::null_mut(), len, libc::PROT_READ | libc::PROT_WRITE,
+    libc::MAP_SHARED, file.as_raw_fd(), 0,
+  ) as *mut u8
+};
+\end{minted}
+\end{frame}
 
-%\begin{frame}[fragile]{Example: Setting registers}
-%\begin{itemize}
-%\item Biggest challenge: safe memory handling with unsafe code
-%\end{itemize}
-%\begin{minted}{rust}
-%fn set_reg32(&self, reg: u32, val: u32) {
-%  assert!(
-%    reg as usize <= self.len - 4 as usize,
-%    "memory access out of bounds"
-%  );
-%
-%  unsafe {
-%    ptr::write_volatile(
-%        (self.addr as usize + reg as usize) as *mut u32, val
-%    );
-%  }
-%}
-%\end{minted}
-%\end{frame}
+\begin{frame}[fragile]{Example: Setting registers}
+\begin{itemize}
+\item Biggest challenge: safe memory handling with unsafe code
+\end{itemize}
+\begin{minted}{rust}
+fn set_reg32(&self, reg: u32, val: u32) {
+  assert!(
+    reg as usize <= self.len - 4 as usize,
+    "memory access out of bounds"
+  );
+
+  unsafe {
+    ptr::write_volatile(
+        (self.addr as usize + reg as usize) as *mut u32, val
+    );
+  }
+}
+\end{minted}
+\end{frame}
 
 %\setbeamertemplate{footline}{}
 %\setbeamertemplate{headline}{}
@@ -996,7 +1128,7 @@
 %\centering\includestandalone[scale=0.8]{figures/benchmarks-all-throughput}
 %\end{frame}
 
-\begin{frame}{Batching at 3.3\,GHz CPU speed}
+\begin{frame}{Batching at 3.3\,GHz CPU speed (single core)}
 \centering\includegraphics[scale=1]{figures/batches-33.pdf}
 \end{frame}
 
@@ -1008,17 +1140,76 @@
 %\setbeamertemplate{footline}[tumfootline]
 %\setbeamertemplate{headline}[tumheadline]
 %
-%\begin{frame}{Swift: Why so slow?}
-%\begin{itemize}
-%\item Lots of time spent in Swift's memory management
-%\item Swift adds calls to release/retain for each used object in each function
-%\item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
-%\vspace{1em}
-%\pause
-%\item Time in release/retain: 76\%
-%\item For comparison: Go spends less than 0.5\% in the garbage collector
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Swift: Why so slow?}
+\begin{itemize}
+\item Lots of time spent in Swift's memory management
+\item Swift adds calls to release/retain for each used object in each function
+\item This is basically the same as wrapping every object in a \texttt{std::shared\_ptr} in C++
+\vspace{1em}
+\pause
+\item Time in release/retain: 76\%
+\item For comparison: Go spends less than 0.5\% in the garbage collector
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why is Rust slower than C?}
+\begin{table}[t]
+ \setlength{\tabcolsep}{1.1mm}
+	\centering
+	\footnotesize
+	\begin{tabular}{lrrrrrrrr}
+		& \multicolumn{4}{c}{Batch 32, 1.6\,GHz} & \multicolumn{4}{c}{Batch 8, 1.6\,GHz} \\
+		\textbf{Events per packet} & \hspace{1em} & \textbf{C} & \textbf{Rust} & \hspace{2.5em} & & \textbf{C} & \textbf{Rust} & \hspace{1.5em} \\
+		\toprule
+		\textbf{Cycles}                     & & 94 & 100     &&& 108 &  120 \\
+		\textbf{Instructions}              & & 127 & 209   &&& 139 &  232  \\
+		\textbf{Instr. per cycle}         & & 1.35 & 2.09 &&& 1.29 & 1.93 &  \vspace{0.35em}  \\
+		\textbf{Branches}                 & & 18 & 24      &&& 19 &  27  \\
+		\textbf{Branch mispredicts} & & 0.05 & 0.08       &&& 0.02 & 0.06 & 		\vspace{0.35em} \\
+		\textbf{Store $\mu$ops}       & & 21.8 & 37.4      &&& 24.4 & 43.0  \\
+		\textbf{Load $\mu$ops}       & & 30.1 & 77.0      &&& 33.4 & 84.2\  \\
+		\textbf{Load L1 hits}                     & & 24.3 & 75.9      &&& 28.8 & 83.1 \\
+		\textbf{Load L2 hits}                     & & 1.1 & 0.05         &&& 1.2 & 0.1 \\
+		\textbf{Load L3 hits}                     & & 0.9 & 0.0      &&& 0.5 & 0.0 \\
+		\textbf{Load L3 misses}               & & 0.3 & 0.1         &&& 0.3 & 0.3 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Performance counter readings in events per packet when forwarding packets}
+	\label{tbl:rust-profiling}
+	\vspace{-3em}
+\end{table}
+\end{frame}
+
+\begin{frame}{Why is Rust slower than C?}
+\begin{table}[t]
+ \setlength{\tabcolsep}{1.1mm}
+	\centering
+	\footnotesize
+	\begin{tabular}{lrrrrrrrr}
+		& \multicolumn{4}{c}{Batch 32, 1.6\,GHz} & \multicolumn{4}{c}{\color{TUMLightGray}Batch 8, 1.6\,GHz} \\
+		\textbf{Events per packet} & \hspace{1em} & \textbf{C} & \textbf{Rust} & \hspace{2.5em} & & \color{TUMLightGray}\textbf{C} & \color{TUMLightGray}\textbf{Rust} & \hspace{1.5em} \\
+		\toprule
+		\textbf{Cycles}                     & & 94 & 100     &&& \color{TUMLightGray}{108} &  \color{TUMLightGray}120 \\
+		\textbf{Instructions}              & & 127 & 209   &&& \color{TUMLightGray}139 &  \color{TUMLightGray}232  \\
+		\textbf{Instr. per cycle}         & & 1.35 & 2.09 &&& \color{TUMLightGray}1.29 & \color{TUMLightGray}1.93 &  \vspace{0.35em}  \\
+\color{TUMLightGray}		\textbf{Branches}                 & & \color{TUMLightGray}18 & \color{TUMLightGray}24      &&& \color{TUMLightGray}19 & \color{TUMLightGray} 27  \\
+\color{TUMLightGray}		\textbf{Branch mispredicts} & & \color{TUMLightGray}0.05 &\color{TUMLightGray} 0.08       &&&\color{TUMLightGray} 0.02 &\color{TUMLightGray} 0.06 & 		\vspace{0.35em} \\
+\color{TUMLightGray}		\textbf{Store $\mu$ops}       & & \color{TUMLightGray}21.8 &\color{TUMLightGray} 37.4      &&&\color{TUMLightGray} 24.4 & \color{TUMLightGray}43.0  \\
+\color{TUMLightGray}		\textbf{Load $\mu$ops}       & & \color{TUMLightGray}30.1 &\color{TUMLightGray} 77.0      &&& \color{TUMLightGray}33.4 &\color{TUMLightGray} 84.2\  \\
+\color{TUMLightGray}		\textbf{Load L1 hits}                     & & \color{TUMLightGray}24.3 &\color{TUMLightGray} 75.9      &&& \color{TUMLightGray}28.8 & \color{TUMLightGray}83.1 \\
+\color{TUMLightGray}		\textbf{Load L2 hits}                     & & \color{TUMLightGray}1.1 &\color{TUMLightGray} 0.05         &&& \color{TUMLightGray}1.2 &\color{TUMLightGray} 0.1 \\
+\color{TUMLightGray}		\textbf{Load L3 hits}                     & &\color{TUMLightGray} 0.9 &\color{TUMLightGray} 0.0      &&& \color{TUMLightGray}0.5 & \color{TUMLightGray}0.0 \\
+\color{TUMLightGray}		\textbf{Load L3 misses}               & & \color{TUMLightGray}0.3 &\color{TUMLightGray} 0.1         &&& \color{TUMLightGray}0.3 & \color{TUMLightGray}0.3 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Performance counter readings in events per packet when forwarding packets}
+	\label{tbl:rust-profiling}
+	\vspace{-3em}
+\end{table}
+\end{frame}
+
+
+
 
 %\begin{frame}{Garbage collection and JIT compilation vs. latency}
 %\centering\includestandalone[scale=0.8]{figures/latency-cdf1}
@@ -1053,50 +1244,37 @@
 \end{frame}
 
 
-\begin{frame}{Languages for code in trustworthy systems}
-\begin{itemize}
-\item Rust
-\begin{itemize}
-\item Fast, no garbage collector
-\item Low-level: Easy to reason about performance
-\item Safest language of the evaluated languages
-\end{itemize}
-\item Go
-\begin{itemize}
-\item Fast, low-latency garbage collector
-\item Garbage collector tuned for sub-millisecond latency
-\item Easier and faster to write than Rust
-\end{itemize}
-\pause
-\item Other languages
-\begin{itemize}
-\item Implement critical parts in different languages in redundant systems
-\item Functional languages for easier formal verification
-\end{itemize}
-\end{itemize}
-\end{frame}
+%\begin{frame}{Languages for code in trustworthy systems}
+%\begin{itemize}
+%\item Rust
+%\begin{itemize}
+%\item Fast, no garbage collector
+%\item Low-level: Easy to reason about performance
+%\item Safest language of the evaluated languages
+%\end{itemize}
+%\item Go
+%\begin{itemize}
+%\item Fast, low-latency garbage collector
+%\item Garbage collector tuned for sub-millisecond latency
+%\item Easier and faster to write than Rust
+%\end{itemize}
+%\pause
+%\item Other languages
+%\begin{itemize}
+%\item Implement critical parts in different languages in redundant systems
+%\item Functional languages for easier formal verification
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
 
 
-\begin{frame}{Conclusions}
-\begin{itemize}
-\item High-level languages can prevent entire classes of bugs
-\item High-level languages are suitable for low-level code
-\item Drivers are becoming more and more complex, simpler drivers reduce attack surface
-\item Future work: A full stack in Rust (ixy + smoltcp), evaluating Redox
-\vspace{1em}
-\item Paper about safer drivers under submission to SIGCOMM
-\item Code for all drivers available on GitHub: \\\url{https://github.com/ixy-languages/ixy-languages}
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Backup: Unprivileged user space drivers}
+\begin{frame}{Unprivileged user space drivers}
 \begin{itemize}
 \item User space drivers usually run with root privileges, but why?
 \pause
 \vspace{1em}
 \item Mapping PCIe resources requires root
-\item Allocating non-transparent huge pages requires root
+\item Allocating non-transparent huge pages requires root (weird implementation detail)
 \item Locking memory requires root
 \vspace{1em}
 \item Can we do that in a small separate program that is easy to audit and then drop privileges?
@@ -1122,34 +1300,37 @@
 \centering\includestandalone[scale=.70]{figures/iommu4}
 \end{frame}
 
-\begin{frame}{Memory access on modern systems}
+\begin{frame}{Memory access on modern systems: IOMMU to the rescue}
 \centering\includestandalone[scale=.70]{figures/iommu5}
 \end{frame}
 
-\begin{frame}{Memory access on modern systems}
+\begin{frame}{Memory access on modern systems: IOMMU to the rescue}
 \centering\includestandalone[scale=.70]{figures/iommu6}
 \end{frame}
 
-%\begin{frame}{Backup: Unprivileged user space drivers on Linux}
-%\begin{itemize}
-%\item[1.] Prepare the system as root
-%\begin{itemize}
-%\item[1.1.] Bind the device to the special \texttt{vfio} driver
-%\item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
-%\item[1.3.] Allow your user to lock some amount of memory via \texttt{ulimit}
-%\end{itemize}
-%\pause
-%\item[2.] \texttt{mmap} the special magic \texttt{vfio} device
-%\item[3.] Do some magic \texttt{ioctl} calls on the magic device
-%\item[4.] Protected DMA memory can also be allocated via an \texttt{ioctl} call
-%\item[5.] Use the device as usual, all accesses are now checked by the IOMMU
-%\vspace{1em}
-%\pause
-%\item We have implemented this in our C driver, Rust is WIP
-%\end{itemize}
-%\end{frame}
-%
-%
+\begin{frame}{Unprivileged user space drivers on Linux}
+\begin{itemize}
+\item[1.] Prepare the system as root
+\begin{itemize}
+\item[1.1.] Bind the device to the special \texttt{vfio} driver
+\item[1.2.] \texttt{chown} the special magic \texttt{vfio} device to your user
+\item[1.3.] Allow your user to lock some amount of memory via \texttt{ulimit}
+\end{itemize}
+\pause
+\item[2.] \texttt{mmap} the special magic \texttt{vfio} device
+\item[3.] Do some magic \texttt{ioctl} calls on the magic device
+\item[4.] Protected DMA memory can also be allocated via an \texttt{ioctl} call
+\item[5.] Use the device as usual, all accesses are now checked by the IOMMU
+\vspace{1em}
+\pause
+\item We have implemented this in C and Rust
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Does the IOMMU cost performance?}
+\centering\includegraphics[scale=1.1]{figures/batches-iommu.pdf}
+\end{frame}
+
 %
 %
 %\begin{frame}{Why write a user space network driver?}
@@ -1180,15 +1361,16 @@
 %\begin{frame}{(Maybe) network stack of the future}
 %\end{frame}
 
-%\begin{frame}{Conclusion: Check out our code}
-%\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
-%\begin{itemize}
-%\item Meta-repository with links:\\\url{https://github.com/ixy-languages/ixy-languages}
-%\item Drivers are simple: don't be afraid of them
-%\item No kernel code needed :)
-%\end{itemize}
+\begin{frame}{Conclusion: Check out our code}
+\centering \qrcode[height=3cm]{https://github.com/ixy-languages/ixy-languages}
+\begin{itemize}
+\item Meta-repository with links:\\\url{https://github.com/ixy-languages/ixy-languages}
+\item Drivers are simple: don't be afraid of them
+\item Should your driver really be in the kernel?
+\item Next time you write a driver: consider a user space driver in a cool language
+\end{itemize}
 %\centering \Huge Q \& A
-%\end{frame}
+\end{frame}
 
 
 
