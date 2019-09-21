@@ -52,12 +52,11 @@
 %	tick label style={font=\fontsize{8}{9}\selectfont},
 %	label style={font=\fontsize{8}{9}\selectfont},
 	every axis legend/.append style={nodes={right}},
-	legend entries={C\hphantom{JavaScript}, Rust, Go, C\#, Java, OCaml, Haskell, Swift, JavaScript},
+	legend entries={C\hphantom{JavaScript}, Rust, Go, Java, C\#, OCaml, Haskell, Swift, JavaScript},
 	legend pos = north east,
 	legend style={at={(1.01,1)}, anchor = north west},
 	legend columns = 1,
 ]
-% ,each nth point=100, filter discard warning=fals
 \addplot [mark=none,color=TUMBlack, thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {c-cdf.csv};
 \addplot [mark=x,color=TUMDarkerBlue, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {rust-cdf.csv};
 \addplot [mark=triangle*,color=TUMGreen, thick,mark repeat*=7] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {go-cdf.csv};
