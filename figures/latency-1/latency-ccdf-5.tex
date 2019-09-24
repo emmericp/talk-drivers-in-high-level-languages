@@ -52,19 +52,20 @@
 %	tick label style={font=\fontsize{8}{9}\selectfont},
 %	label style={font=\fontsize{8}{9}\selectfont},
 	every axis legend/.append style={nodes={right}},
-	legend entries={C\hphantom{JavaScript}, Rust, Go, Java, C\#, OCaml, Haskell, Swift, JavaScript},
+	legend entries={C\hphantom{Javacript}, Rust, Go, Java, Haskell, C\#, Swift, OCaml, JavaScript},
 	legend pos = north east,
 	legend style={at={(1.01,1)}, anchor = north west},
 	legend columns = 1,
 ]
+% ,each nth point=100, filter discard warning=fals
 \addplot [mark=none,color=TUMBlack, thick] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {c-cdf.csv};
 \addplot [mark=x,color=TUMDarkerBlue, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {rust-cdf.csv};
 \addplot [mark=triangle*,color=TUMGreen, thick,mark repeat*=7] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {go-cdf.csv};
 \addplot [mark=diamond*,color=TUMLightBlue, thick,mark repeat*=5] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {java-shenandoah-cdf.csv};
-\addplot [mark=+,color=TUMOrange, thick,mark repeat*=20] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {csharp-cdf.csv};
-%\addplot [mark=*,color=TUMYellow, thick,mark repeat*=10] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {ocaml-cdf.csv};
-%\addplot [mark=square*,color=TUMRed, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {haskell-cdf.csv};
+\addplot [mark=square*,color=TUMRed, thick,mark repeat*=11] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {haskell-cdf.csv};
+%\addplot [mark=+,color=TUMOrange, thick,mark repeat*=20] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {csharp-cdf.csv};
 %\addplot [mark=triangle,color=TUMPurple, thick,mark repeat*=10] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {swift-cdf.csv};
+%\addplot [mark=*,color=TUMYellow, thick,mark repeat*=10] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {ocaml-cdf.csv};
 %\addplot [mark=o,color=TUMDarkerGreen,mark repeat*=153] table[col sep=comma,x=lat,y expr=1-\thisrow{cdf}] {javascript-cdf.csv};
 
 
